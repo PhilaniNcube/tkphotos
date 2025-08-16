@@ -17,6 +17,8 @@ import {
   Camera,
 } from "lucide-react";
 import { JwtPayload } from "@supabase/supabase-js";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type SupabaseUserLike = JwtPayload & {
   email?: string;
@@ -35,31 +37,30 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home, current: true },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
   {
     name: "Galleries",
     href: "/dashboard/galleries",
     icon: Layout,
-    current: false,
   },
   {
     name: "Collections",
     href: "/dashboard/collections",
     icon: Blocks,
-    current: false,
   },
-  { name: "Photos", href: "/dashboard/photos", icon: Camera, current: false },
+  { name: "Photos", href: "/dashboard/photos", icon: Camera },
   {
     name: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    current: false,
   },
 ];
 
 export function DashboardSidebar({ className, userData }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  const pathname = usePathname();
 
   const meta = userData?.user_metadata || {};
   const first = meta.first_name || (userData as any).first_name || "";
@@ -131,12 +132,12 @@ export function DashboardSidebar({ className, userData }: SidebarProps) {
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
                   "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                  item.current
+                  pathname === item.href
                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 )}
@@ -146,7 +147,7 @@ export function DashboardSidebar({ className, userData }: SidebarProps) {
                 {!isCollapsed && (
                   <span className="ml-3 truncate">{item.name}</span>
                 )}
-              </a>
+              </Link>
             );
           })}
         </nav>
