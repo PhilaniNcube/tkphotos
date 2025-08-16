@@ -349,3 +349,14 @@ export const updatePhotoSchema = z
   );
 
 export type UpdatePhotoInput = z.infer<typeof updatePhotoSchema>;
+
+export interface CreateGalleryState {
+  success: boolean;
+  error: string | null;
+  fieldErrors?: Record<string, string[]>;
+}
+
+export const initialCreateGalleryState: CreateGalleryState = {
+  success: false,
+  error: null,
+};
