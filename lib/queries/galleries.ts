@@ -155,3 +155,55 @@ export async function getGalleriesCursorPage(
 
   return { data: rows.slice(0, limit), nextCursor };
 }
+
+// Fetch a single gallery by id
+export async function getGalleryById(id: number): Promise<GalleryRow | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("galleries")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) return null;
+  return data;
+}
+
+export interface GalleryWithPhotos extends GalleryRow {
+  photos: {
+    id: string;
+    filename: string;
+    storage_key: string;
+    caption: string | null;
+    created_at: string;
+    is_featured: boolean;
+  }[];
+}
+
+export async function getGalleryWithPhotos(
+  id: number,
+  opts: { limit?: number } = {}
+): Promise<GalleryWithPhotos | null> {
+  const supabase = await createClient();
+  const gallery = await getGalleryById(id);
+  if (!gallery) return null;
+  const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500);
+  const { data: photos } = await supabase
+    .from("photos")
+    .select("id,filename,storage_key,caption,created_at,is_featured")
+    .eq("gallery_id", id)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return { ...gallery, photos: photos ?? [] };
+}
+export async function getGalleryBySlug(
+  slug: string
+): Promise<GalleryRow | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("galleries")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+  if (error) return null;
+  return data;
+}

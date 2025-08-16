@@ -89,8 +89,8 @@ export default async function DashboardGalleriesPage({
               className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xl"
             >
               <Card className="h-full transition-colors hover:border-ring/60">
-                <CardHeader className="pb-2">
-                  <CardTitle className="line-clamp-1" title={g.title}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="" title={g.title}>
                     {g.title}
                   </CardTitle>
                   {g.description && (
