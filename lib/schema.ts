@@ -360,3 +360,16 @@ export const initialCreateGalleryState: CreateGalleryState = {
   success: false,
   error: null,
 };
+
+// ===================== Photo Action State =====================
+// Moved from server action file to avoid exporting non-action symbols there.
+export interface CreatePhotoState {
+  success: boolean;
+  error: string | null;
+  fieldErrors?: Record<string, string[]>;
+}
+
+export const initialCreatePhotoState: CreatePhotoState = {
+  success: false,
+  error: null,
+};
