@@ -18,7 +18,7 @@ export default async function CollectionsPage() {
   const collections = data || [];
 
   return (
-    <div className="container mx-auto py-10 space-y-8">
+    <div className="container mx-auto py-10 space-y-8 px-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold">Collections</h1>
         <span className="text-sm text-muted-foreground">
