@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import React from "react";
 import PhotoGalleryDialog from "./photo-gallery-dialog";
+import NewCollectionDialog from "./new-collection-dialog";
 
 const DashboardHeader = () => {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ const DashboardHeader = () => {
         </div>
         <div className="flex gap-x-3">
           <PhotoGalleryDialog />
+          <NewCollectionDialog />
         </div>
       </div>
     </header>

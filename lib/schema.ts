@@ -373,3 +373,48 @@ export const initialCreatePhotoState: CreatePhotoState = {
   success: false,
   error: null,
 };
+
+// ===================== Collection Action State =====================
+export interface CreateCollectionState {
+  success: boolean;
+  error: string | null;
+  fieldErrors?: Record<string, string[]>;
+}
+
+export const initialCreateCollectionState: CreateCollectionState = {
+  success: false,
+  error: null,
+};
+
+// ================= Add gallery to collection =================
+// Accepts FormData with fields: collection_id, gallery_id
+// Validates existence & uniqueness (no duplicate pair) before insert.
+export interface LinkGalleryState {
+  success: boolean;
+  error: string | null;
+  fieldErrors?: Record<string, string[]>;
+}
+
+export const initialLinkGalleryState: LinkGalleryState = {
+  success: false,
+  error: null,
+};
+
+export const linkGallerySchema = z
+  .object({
+    collection_id: z
+      .string()
+      .refine((v) => /^\d+$/.test(v), {
+        message: "collection_id must be an integer",
+      })
+      .transform((v) => Number(v))
+      .refine((n) => n > 0, { message: "collection_id must be positive" }),
+    gallery_id: z
+      .string()
+      .refine((v) => /^\d+$/.test(v), {
+        message: "gallery_id must be an integer",
+      })
+      .transform((v) => Number(v))
+      .refine((n) => n > 0, { message: "gallery_id must be positive" }),
+  })
+  .strict();

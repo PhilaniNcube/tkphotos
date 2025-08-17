@@ -17,30 +17,44 @@ const searchParamsCache = createSearchParamsCache({
   limit: parseAsInteger.withDefault(20).withOptions({ shallow: false }),
 });
 
+// Next.js 15 makes searchParams async (a Promise). Support both sync & async for forward/backward compatibility.
 interface PageProps {
-  searchParams: Record<string, string | string[] | undefined>;
+  searchParams:
+    | Record<string, string | string[] | undefined>
+    | Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function DashboardGalleriesPage({
   searchParams,
 }: PageProps) {
-  const { limit } = searchParamsCache.parse(searchParams);
+  // Resolve async searchParams if running on Next.js 15+, otherwise use directly.
+  const resolvedParams =
+    (searchParams as any)?.then &&
+    typeof (searchParams as any).then === "function"
+      ? await (searchParams as Promise<
+          Record<string, string | string[] | undefined>
+        >)
+      : (searchParams as Record<string, string | string[] | undefined>);
+
+  const { limit } = searchParamsCache.parse(resolvedParams);
 
   const rawSearch =
-    typeof searchParams.search === "string" ? searchParams.search : undefined;
+    typeof resolvedParams.search === "string"
+      ? resolvedParams.search
+      : undefined;
   const search =
     rawSearch && rawSearch.trim().length ? rawSearch.trim() : undefined;
   const cursorCreatedAt =
-    typeof searchParams.cursorCreatedAt === "string"
-      ? searchParams.cursorCreatedAt
+    typeof resolvedParams.cursorCreatedAt === "string"
+      ? resolvedParams.cursorCreatedAt
       : undefined;
   const cursorIdStr =
-    typeof searchParams.cursorId === "string"
-      ? searchParams.cursorId
+    typeof resolvedParams.cursorId === "string"
+      ? resolvedParams.cursorId
       : undefined;
   const cursorId = cursorIdStr ? Number(cursorIdStr) : undefined;
   const pageStr =
-    typeof searchParams.page === "string" ? searchParams.page : undefined;
+    typeof resolvedParams.page === "string" ? resolvedParams.page : undefined;
   const page = pageStr ? Math.max(1, Number(pageStr) || 1) : 1;
 
   const { data, nextCursor, error } = await getGalleriesCursorPage({
