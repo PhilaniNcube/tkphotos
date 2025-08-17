@@ -17,7 +17,7 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
       >
         Skip to content
       </Link>
-      <header className="sticky top-0 z-40 w-full border-b bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/50">
+      <header className="sticky top-0 z-40 w-full border-b bg-white backdrop-blur supports-[backdrop-filter]:bg-background/50">
         <div className="container flex h-16 items-center justify-between mx-auto px-4">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <div className="flex gap-x-2 items-center">

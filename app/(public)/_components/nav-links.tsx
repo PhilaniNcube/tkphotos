@@ -87,7 +87,7 @@ const NavLinks = () => {
               <Link
                 href={l.href}
                 className={
-                  "block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground md:px-3 md:py-2 " +
+                  "block rounded-md px-3 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-accent hover:text-accent-foreground md:px-3 md:py-2 " +
                   (isActive(l.href) ? "text-primary" : "text-muted-foreground")
                 }
               >
