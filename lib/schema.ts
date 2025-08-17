@@ -418,3 +418,12 @@ export const linkGallerySchema = z
       .refine((n) => n > 0, { message: "gallery_id must be positive" }),
   })
   .strict();
+
+export const contactSchema = z.object({
+  name: z.string().min(2, "Name is too short"),
+  email: z.string().email("Invalid email"),
+  service: z.string().optional(),
+  message: z.string().min(10, "Message should be at least 10 characters"),
+});
+
+export type ContactInput = z.infer<typeof contactSchema>;
