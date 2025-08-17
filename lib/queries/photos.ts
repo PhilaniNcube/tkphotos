@@ -101,3 +101,29 @@ export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
   if (error) return [];
   return data;
 }
+
+// Fetch recent photos for multiple galleries. Returns a map galleryId -> photos[]
+export async function getRecentPhotosForGalleries(
+  galleryIds: number[],
+  opts: { perGallery?: number } = {}
+): Promise<Record<number, PhotoRow[]>> {
+  if (!galleryIds.length) return {};
+  const perGallery = Math.min(Math.max(opts.perGallery ?? 4, 1), 24);
+  const supabase = await createClient();
+  // Fetch in a single query using in() then we'll group & slice
+  const { data, error } = await supabase
+    .from("photos")
+    .select("*")
+    .in("gallery_id", galleryIds)
+    .order("created_at", { ascending: false })
+    .limit(galleryIds.length * perGallery * 2); // over-fetch a bit then slice per group
+  if (error || !data) return {};
+  const grouped: Record<number, PhotoRow[]> = {};
+  for (const p of data) {
+    if (!grouped[p.gallery_id]) grouped[p.gallery_id] = [];
+    if (grouped[p.gallery_id].length < perGallery) {
+      grouped[p.gallery_id].push(p);
+    }
+  }
+  return grouped;
+}

@@ -163,3 +163,24 @@ export async function getCollectionWithGalleries(
     .filter(Boolean) as CollectionWithGalleries["galleries"];
   return { ...collection, galleries };
 }
+
+export async function getCollectionGalleries(
+  collectionSlug: string
+): Promise<CollectionWithGalleries | null> {
+  const supabase = await createClient();
+  const collection = await getCollectionBySlug(collectionSlug);
+  if (!collection) return null;
+  const { data: rows, error } = await supabase
+    .from("collection_galleries")
+    .select("galleries(id,title,slug,is_public,created_at)")
+    .eq("collection_id", collection.id)
+    .order("gallery_id", { ascending: false });
+  if (error) {
+    console.error("Error fetching collection galleries:", error);
+    return { ...collection, galleries: [] };
+  }
+  const galleries = (rows || [])
+    .map((r: any) => r.galleries)
+    .filter(Boolean) as CollectionWithGalleries["galleries"];
+  return { ...collection, galleries };
+}
