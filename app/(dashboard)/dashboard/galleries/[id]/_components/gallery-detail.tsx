@@ -1,3 +1,5 @@
+"use client";
+
 import { GalleryWithPhotos } from "@/lib/queries/galleries";
 import {
   Card,
@@ -9,28 +11,97 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { photoSrc } from "@/lib/utils";
+import {
+  updateGalleryCoverImageAction,
+  updateGalleryPublicStatusAction,
+} from "@/lib/actions/galleries";
+import { Checkbox } from "@/components/ui/checkbox";
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+// Client wrapper for each photo item to allow selecting cover image
+function CoverCheckbox({
+  galleryId,
+  photoStorageKey,
+  currentCover,
+}: {
+  galleryId: number;
+  photoStorageKey: string;
+  currentCover: string | null;
+}) {
+  "use client";
+  const [pending, setPending] = React.useState(false);
+  const isActive = currentCover === photoStorageKey;
+
+  async function onChange(checked: boolean) {
+    if (!checked) return; // only allow setting, clearing handled elsewhere
+    setPending(true);
+    const formData = new FormData();
+    formData.append("id", String(galleryId));
+    formData.append("cover_image", photoStorageKey);
+    await updateGalleryCoverImageAction(
+      { success: false, error: null },
+      formData
+    );
+    // Rely on revalidation to refresh page; optimistic UI could be added
+    setPending(false);
+  }
+
+  return (
+    <label className="absolute top-1 right-1 z-10 flex items-center gap-1 rounded bg-black/60 px-1.5 py-1 text-[10px] text-white backdrop-blur-sm">
+      <Checkbox
+        checked={isActive}
+        disabled={pending}
+        onCheckedChange={(v) => onChange(Boolean(v))}
+        className="size-3.5"
+        aria-label={isActive ? "Current cover image" : "Set as cover image"}
+      />
+      {isActive ? "Cover" : pending ? "Saving" : "Set"}
+    </label>
+  );
+}
 
 interface GalleryDetailProps {
   gallery: GalleryWithPhotos;
 }
 
 export function GalleryDetail({ gallery }: GalleryDetailProps) {
+  const [publicPending, setPublicPending] = React.useState(false);
+
+  async function togglePublic() {
+    if (publicPending) return;
+    setPublicPending(true);
+    await updateGalleryPublicStatusAction(gallery.id, !gallery.is_public);
+    // No local optimistic update; rely on revalidation. Could add router.refresh() for immediate.
+    setPublicPending(false);
+  }
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-4">
             <span>{gallery.title}</span>
-            <span className="text-xs font-normal text-muted-foreground">
-              ID #{gallery.id}
-            </span>
+            <div className="flex items-center gap-x-2">
+              <Button
+                type="button"
+                onClick={togglePublic}
+                disabled={publicPending}
+                className="text-white  disabled:opacity-40"
+              >
+                {publicPending
+                  ? "Updating..."
+                  : gallery.is_public
+                  ? "Make Private"
+                  : "Make Public"}
+              </Button>
+            </div>
           </CardTitle>
           <CardDescription className="space-y-1">
             {gallery.description || (
               <span className="italic opacity-70">No description</span>
             )}
             <div className="flex flex-wrap gap-4 text-xs pt-2">
-              <span>Status: {gallery.is_public ? "Public" : "Private"}</span>
               {gallery.event_date && <span>Event: {gallery.event_date}</span>}
               <span>
                 Created: {new Date(gallery.created_at).toLocaleString()}
@@ -79,13 +150,20 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
                   <Card className="overflow-hidden group p-0">
                     <div className="relative aspect-video bg-muted">
                       {src ? (
-                        <Image
-                          src={src}
-                          alt={p.caption || p.filename}
-                          fill
-                          sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 25vw"
-                          className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
+                        <>
+                          <Image
+                            src={src}
+                            alt={p.caption || p.filename}
+                            fill
+                            sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 25vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <CoverCheckbox
+                            galleryId={gallery.id}
+                            photoStorageKey={p.storage_key}
+                            currentCover={gallery.cover_image}
+                          />
+                        </>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">
                           No image

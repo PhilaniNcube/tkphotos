@@ -59,3 +59,102 @@ export async function createGalleryAction(
     };
   }
 }
+
+// Lightweight state shape reused for updates (not exported to keep only function exports)
+type ActionState = {
+  success: boolean;
+  error: string | null;
+  fieldErrors?: Record<string, string[]>;
+};
+
+// Server action to update only the cover image of a gallery (can also clear it by submitting empty string)
+export async function updateGalleryCoverImageAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  try {
+    const raw = Object.fromEntries(formData.entries());
+    const fieldErrors: Record<string, string[]> = {};
+
+    // id parsing
+    const idRaw = raw.id ?? raw.gallery_id ?? raw.galleryId;
+    const idNum =
+      typeof idRaw === "string" && /^\d+$/.test(idRaw) ? Number(idRaw) : NaN;
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      fieldErrors.id = ["Valid numeric gallery id required"];
+    }
+
+    // cover image normalization (allow clear)
+    const coverRaw =
+      (raw.cover_image as string) ?? (raw.coverImage as string) ?? "";
+    const cover_image = coverRaw.trim() === "" ? null : coverRaw.trim();
+
+    if (cover_image) {
+      // basic validation: allow http(s) or storage key without whitespace
+      if (/(\s)/.test(cover_image)) {
+        fieldErrors.cover_image = ["Cover image must not contain whitespace"];
+      }
+    }
+
+    if (Object.keys(fieldErrors).length) {
+      return { success: false, error: "Validation failed", fieldErrors };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("galleries")
+      .update({ cover_image })
+      .eq("id", idNum);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    // Revalidate dashboard & public listings (and generic galleries page)
+    revalidatePath("/dashboard/galleries");
+    revalidatePath("/galleries");
+
+    return { success: true, error: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Unexpected error",
+    };
+  }
+}
+
+// Server action to update the public status of a gallery.
+// Simplified signature: pass the gallery id and desired boolean value.
+export async function updateGalleryPublicStatusAction(
+  galleryId: number,
+  newIsPublic: boolean
+): Promise<ActionState> {
+  try {
+    if (!Number.isInteger(galleryId) || galleryId <= 0) {
+      return {
+        success: false,
+        error: "Valid positive integer galleryId required",
+        fieldErrors: { id: ["Invalid gallery id"] },
+      };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("galleries")
+      .update({ is_public: newIsPublic })
+      .eq("id", galleryId);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/dashboard/galleries");
+    revalidatePath("/galleries");
+    return { success: true, error: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Unexpected error",
+    };
+  }
+}

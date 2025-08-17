@@ -18,7 +18,7 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
         return (
           <li key={p.id}>
             <Card className="overflow-hidden group p-0">
-              <div className="relative aspect-square bg-muted">
+              <div className="relative aspect-video bg-muted">
                 {src ? (
                   <Image
                     src={src}

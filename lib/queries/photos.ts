@@ -90,3 +90,14 @@ export async function getPhotoById(id: string): Promise<PhotoRow | null> {
   if (error) return null;
   return data;
 }
+
+export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("photos")
+    .select("*")
+    .eq("is_featured", true)
+    .limit(limit);
+  if (error) return [];
+  return data;
+}

@@ -45,7 +45,7 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
 const Footer = () => {
   return (
     <footer className="border-t bg-background/60 py-8 text-sm">
-      <div className="container flex flex-col justify-between gap-4 md:flex-row md:items-center">
+      <div className="container mx-auto px-4 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <p className="text-muted-foreground">
           &copy; {new Date().getFullYear()} TK Photos. All rights reserved.
         </p>

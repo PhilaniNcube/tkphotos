@@ -207,3 +207,43 @@ export async function getGalleryBySlug(
   if (error) return null;
   return data;
 }
+
+// Lightweight homepage galleries fetch: returns up to `limit` public galleries,
+// newest first, plus up to `photosPerGallery` recent photos (for cover display / counts).
+export async function getHomepageGalleries(
+  options: {
+    limit?: number;
+    photosPerGallery?: number;
+  } = {}
+) {
+  const supabase = await createClient();
+  const limit = Math.min(Math.max(options.limit ?? 3, 1), 12);
+  const photosPerGallery = Math.min(
+    Math.max(options.photosPerGallery ?? 1, 0),
+    8
+  );
+
+  const { data: galleries, error } = await supabase
+    .from("galleries")
+    .select("*")
+    .eq("is_public", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error || !galleries?.length) return [] as GalleryWithPhotos[];
+
+  if (photosPerGallery === 0)
+    return galleries.map((g) => ({ ...g, photos: [] }));
+
+  // Fetch photos for each gallery (could be optimized with RPC or a single IN query)
+  const results: GalleryWithPhotos[] = [];
+  for (const g of galleries) {
+    const { data: photos } = await supabase
+      .from("photos")
+      .select("id,filename,storage_key,caption,created_at,is_featured")
+      .eq("gallery_id", g.id)
+      .order("created_at", { ascending: false })
+      .limit(photosPerGallery);
+    results.push({ ...g, photos: photos ?? [] });
+  }
+  return results;
+}
