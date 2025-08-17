@@ -1,0 +1,22 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg" role="img"
+    aria-labelledby="title desc">
+    <title>Placeholder portrait of Thandikaya Matokazi</title>
+    <desc>Abstract soft gradient placeholder image. Replace with real portrait photograph.</desc>
+    <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0%" stop-color="#78716c" />
+            <stop offset="50%" stop-color="#a8a29e" />
+            <stop offset="100%" stop-color="#d6d3d1" />
+        </linearGradient>
+        <clipPath id="r">
+            <rect x="0" y="0" width="800" height="1000" rx="48" />
+        </clipPath>
+    </defs>
+    <rect width="800" height="1000" fill="url(#g)" clip-path="url(#r)" />
+    <g clip-path="url(#r)">
+        <circle cx="400" cy="340" r="170" fill="#f5f5f4" opacity="0.55" />
+        <circle cx="400" cy="340" r="150" fill="#e7e5e4" opacity="0.9" />
+        <path d="M170 860c22-188 118-300 230-300s208 112 230 300" fill="#e7e5e4" opacity="0.85" />
+        <path d="M170 860h460c0 0-14 48-230 48s-230-48-230-48z" fill="#f5f5f4" opacity="0.6" />
+    </g>
+</svg>
