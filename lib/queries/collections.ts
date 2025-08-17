@@ -71,6 +71,30 @@ export async function getCollectionsPaginated(
   };
 }
 
+// Fetch all collections (optionally limited) for lightweight public listings.
+// Provide ordering and optional limit (defaults: order by created_at desc, no limit).
+export async function getAllCollections(
+  opts: {
+    orderBy?: "created_at" | "name";
+    ascending?: boolean;
+    limit?: number;
+  } = {}
+): Promise<{ data: CollectionRow[]; error?: string }> {
+  const supabase = await createClient();
+  const orderBy = opts.orderBy ?? "created_at";
+  const ascending = opts.ascending ?? false;
+  let query = supabase.from("collections").select("*").order(orderBy, {
+    ascending,
+    nullsFirst: false,
+  });
+  if (opts.limit && opts.limit > 0) {
+    query = query.limit(Math.min(Math.max(opts.limit, 1), 500));
+  }
+  const { data, error } = await query;
+  if (error) return { data: [], error: error.message };
+  return { data: data || [] };
+}
+
 export async function getCollectionById(
   id: string
 ): Promise<CollectionRow | null> {
