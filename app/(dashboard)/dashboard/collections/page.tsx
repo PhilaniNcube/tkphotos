@@ -27,22 +27,13 @@ const searchParamsCache = createSearchParamsCache({
 });
 
 interface PageProps {
-  searchParams:
-    | Record<string, string | string[] | undefined>
-    | Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function DashboardCollectionsPage({
   searchParams,
 }: PageProps) {
-  const resolvedParams =
-    (searchParams as any)?.then &&
-    typeof (searchParams as any).then === "function"
-      ? await (searchParams as Promise<
-          Record<string, string | string[] | undefined>
-        >)
-      : (searchParams as Record<string, string | string[] | undefined>);
-
+  const resolvedParams = await searchParams;
   const { page, pageSize } = searchParamsCache.parse(resolvedParams);
   const rawSearch =
     typeof resolvedParams.search === "string"

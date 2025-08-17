@@ -19,23 +19,13 @@ const searchParamsCache = createSearchParamsCache({
 
 // Next.js 15 makes searchParams async (a Promise). Support both sync & async for forward/backward compatibility.
 interface PageProps {
-  searchParams:
-    | Record<string, string | string[] | undefined>
-    | Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function DashboardGalleriesPage({
   searchParams,
 }: PageProps) {
-  // Resolve async searchParams if running on Next.js 15+, otherwise use directly.
-  const resolvedParams =
-    (searchParams as any)?.then &&
-    typeof (searchParams as any).then === "function"
-      ? await (searchParams as Promise<
-          Record<string, string | string[] | undefined>
-        >)
-      : (searchParams as Record<string, string | string[] | undefined>);
-
+  const resolvedParams = await searchParams;
   const { limit } = searchParamsCache.parse(resolvedParams);
 
   const rawSearch =
