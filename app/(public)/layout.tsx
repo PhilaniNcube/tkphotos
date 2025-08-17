@@ -21,7 +21,7 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <div className="flex gap-x-2 items-center">
               <MobileMenu />
-              TK Photos
+              TK Media
             </div>
           </Link>
           {/* Desktop nav */}
@@ -47,7 +47,7 @@ const Footer = () => {
     <footer className="border-t bg-background/60 py-8 text-sm">
       <div className="container mx-auto px-4 flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <p className="text-muted-foreground">
-          &copy; {new Date().getFullYear()} TK Photos. All rights reserved.
+          &copy; {new Date().getFullYear()} TK Media. All rights reserved.
         </p>
         <div className="flex gap-4 text-muted-foreground">
           <Link href="/privacy" className="hover:text-primary">

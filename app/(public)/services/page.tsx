@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Services | TK Photos",
+  title: "Services | TK Media",
   description:
     "Professional photography and media services: events, families, sports, conferences, videography, and media management.",
 };

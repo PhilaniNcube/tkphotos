@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "About | TK Photos",
+  title: "About | TK Media",
   description:
     "Learn about Thandikaya Matokazi – Eastern Cape photographer with 6+ years experience capturing events, families, sport and corporate stories.",
 };
