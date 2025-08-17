@@ -4,6 +4,7 @@ import NavLinks from "./_components/nav-links";
 import MobileMenu from "./_components/mobile-menu";
 import { getCurrentUser } from "@/lib/queries/user";
 import UserButton from "./_components/user-button";
+import Image from "next/image";
 
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   const userData = await getCurrentUser();
@@ -21,7 +22,13 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <div className="flex gap-x-2 items-center">
               <MobileMenu />
-              TK Media
+              <Image
+                src="/logo.webp"
+                alt="TK Media"
+                width={799}
+                height={604}
+                className="w-18 object-cover"
+              />
             </div>
           </Link>
           {/* Desktop nav */}
