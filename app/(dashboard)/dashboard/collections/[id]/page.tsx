@@ -4,16 +4,13 @@ import { CollectionDetail } from "./_components/collection-detail";
 import { AddGalleryToCollectionForm } from "./_components/add-gallery-form";
 
 interface CollectionPageProps {
-  params: { id: string } | Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
-  const resolved =
-    (params as any)?.then && typeof (params as any).then === "function"
-      ? await (params as Promise<{ id: string }>)
-      : (params as { id: string });
-
-  const idNum = Number(resolved.id);
+  // In Next.js 15 route params are always provided as a Promise
+  const { id } = await params;
+  const idNum = Number(id);
   if (Number.isNaN(idNum)) {
     return <div className="text-sm text-red-600">Invalid collection id</div>;
   }

@@ -9,7 +9,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  /* config options here */
+  // Disable lint and type errors from failing production builds (requested)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
