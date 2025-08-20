@@ -274,13 +274,18 @@ export const createPhotoSchema = z
     storage_key: z
       .string()
       .trim()
-      .regex(storageKeyRegex, {
-        message:
-          "Storage key may contain letters, numbers, / . _ - and must be at least 3 chars",
-      })
-      .refine((v) => !v.includes(".."), {
-        message: "Storage key must not contain '..' sequences",
-      }),
+      .refine(
+        (v) => {
+          // Accept either old-style relative keys (match regex) or full http(s) URLs (UploadThing)
+          if (/^https?:\/\//i.test(v)) return true;
+          if (!storageKeyRegex.test(v)) return false;
+          return !v.includes("..");
+        },
+        {
+          message:
+            "Storage key must be a valid path (/ . _ -) or a full http(s) URL",
+        }
+      ),
     gallery_id: z
       .number()
       .int({ message: "Gallery id must be an integer" })
@@ -318,13 +323,17 @@ export const updatePhotoSchema = z
     storage_key: z
       .string()
       .trim()
-      .regex(storageKeyRegex, {
-        message:
-          "Storage key may contain letters, numbers, / . _ - and must be at least 3 chars",
-      })
-      .refine((v) => !v.includes(".."), {
-        message: "Storage key must not contain '..' sequences",
-      })
+      .refine(
+        (v) => {
+          if (/^https?:\/\//i.test(v)) return true;
+          if (!storageKeyRegex.test(v)) return false;
+          return !v.includes("..");
+        },
+        {
+          message:
+            "Storage key must be a valid path (/ . _ -) or a full http(s) URL",
+        }
+      )
       .optional(),
     gallery_id: z
       .number()

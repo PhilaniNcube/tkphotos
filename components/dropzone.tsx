@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { type UseSupabaseUploadReturn } from "@/hooks/use-supabase-upload";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, File, Loader2, Upload, X } from "lucide-react";
 import {
@@ -29,8 +28,27 @@ export const formatBytes = (
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 };
 
+// Old upload hook removed; keeping component for potential future custom implementation.
+// Define minimal shape expected if reintroduced.
+interface BasicUploadState {
+  files: any[];
+  isSuccess: boolean;
+  isDragActive: boolean;
+  isDragReject: boolean;
+  errors: { name: string; message: string }[];
+  successes: string[];
+  loading: boolean;
+  maxFileSize: number;
+  maxFiles: number;
+  setFiles: (files: any[]) => void;
+  onUpload: () => void;
+  inputRef: React.RefObject<HTMLInputElement>;
+  getRootProps: (opts?: any) => any;
+  getInputProps: () => any;
+}
+
 type DropzoneContextType = Omit<
-  UseSupabaseUploadReturn,
+  BasicUploadState,
   "getRootProps" | "getInputProps"
 >;
 
@@ -38,7 +56,7 @@ const DropzoneContext = createContext<DropzoneContextType | undefined>(
   undefined
 );
 
-type DropzoneProps = UseSupabaseUploadReturn & {
+type DropzoneProps = BasicUploadState & {
   className?: string;
 };
 
@@ -145,7 +163,7 @@ const DropzoneContent = ({ className }: { className?: string }) => {
               {file.errors.length > 0 ? (
                 <p className="text-xs text-destructive">
                   {file.errors
-                    .map((e) =>
+                    .map((e: any) =>
                       e.message.startsWith("File is larger than")
                         ? `File is larger than ${formatBytes(
                             maxFileSize,

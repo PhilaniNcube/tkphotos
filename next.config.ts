@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ooxvvuililixounsknpj.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "uadq23xeqd.ufs.sh",
+      },
     ],
   },
   // Disable lint and type errors from failing production builds (requested)

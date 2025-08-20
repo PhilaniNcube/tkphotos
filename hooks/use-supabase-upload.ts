@@ -1,12 +1,12 @@
-import { createClient } from "@/lib/client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   type FileError,
   type FileRejection,
   useDropzone,
 } from "react-dropzone";
-
-const supabase = createClient();
+import { generateReactHelpers } from "@uploadthing/react/hooks";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
+const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface FileWithPreview extends File {
   preview?: string;
@@ -45,26 +45,26 @@ type UseSupabaseUploadOptions = {
    *
    * This is set in the Cache-Control: max-age=<seconds> header. Defaults to 3600 seconds.
    */
-  cacheControl?: number;
+  cacheControl?: number; // ignored in UploadThing variant
+  upsert?: boolean; // ignored in UploadThing variant
   /**
-   * When set to true, the file is overwritten if it exists.
-   *
-   * When set to false, an error is thrown if the object already exists. Defaults to `false`
+   * UploadThing route name. Defaults to 'photoUploader'.
    */
-  upsert?: boolean;
+  utRoute?: keyof OurFileRouter;
 };
 
 type UseSupabaseUploadReturn = ReturnType<typeof useSupabaseUpload>;
 
 const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
   const {
-    bucketName,
-    path,
+    bucketName, // kept for backward compat – unused
+    path, // unused (UploadThing does not support subpaths like this directly)
     allowedMimeTypes = [],
     maxFileSize = Number.POSITIVE_INFINITY,
     maxFiles = 1,
-    cacheControl = 3600,
-    upsert = false,
+    cacheControl = 3600, // unused
+    upsert = false, // unused
+    utRoute = "photoUploader",
   } = options;
 
   const [files, setFiles] = useState<FileWithPreview[]>([]);
@@ -117,11 +117,41 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
     multiple: maxFiles !== 1,
   });
 
+  // UploadThing hook – dynamic route
+  const ut = useUploadThing(utRoute as any, {
+    onUploadProgress: () => {
+      // optional: could map progress per file later
+    },
+    onClientUploadComplete: (res: { name: string; url: string }[]) => {
+      // Map results back to successes
+      const uploadedNames = res.map((r) => r.name);
+      const newSuccesses = Array.from(
+        new Set([...successes, ...uploadedNames])
+      );
+      setSuccesses(newSuccesses);
+      // Store URL mapping
+      setUploadedUrls((prev) => {
+        const next = { ...prev };
+        res.forEach(
+          (r: { name: string; url: string }) => (next[r.name] = r.url)
+        );
+        return next;
+      });
+      setLoading(false);
+    },
+    onUploadError: (err: { file?: File; message: string }) => {
+      setErrors((prev) => [
+        ...prev.filter((e) => e.name !== err.file?.name),
+        { name: err.file?.name || "unknown", message: err.message },
+      ]);
+      setLoading(false);
+    },
+  });
+
+  const [uploadedUrls, setUploadedUrls] = useState<Record<string, string>>({});
+
   const onUpload = useCallback(async () => {
     setLoading(true);
-
-    // [Joshen] This is to support handling partial successes
-    // If any files didn't upload for any reason, hitting "Upload" again will only upload the files that had errors
     const filesWithErrors = errors.map((x) => x.name);
     const filesToUpload =
       filesWithErrors.length > 0
@@ -130,35 +160,9 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
             ...files.filter((f) => !successes.includes(f.name)),
           ]
         : files;
-
-    const responses = await Promise.all(
-      filesToUpload.map(async (file) => {
-        const { error } = await supabase.storage
-          .from(bucketName)
-          .upload(!!path ? `${path}/${file.name}` : file.name, file, {
-            cacheControl: cacheControl.toString(),
-            upsert,
-          });
-        if (error) {
-          return { name: file.name, message: error.message };
-        } else {
-          return { name: file.name, message: undefined };
-        }
-      })
-    );
-
-    const responseErrors = responses.filter((x) => x.message !== undefined);
-    // if there were errors previously, this function tried to upload the files again so we should clear/overwrite the existing errors.
-    setErrors(responseErrors);
-
-    const responseSuccesses = responses.filter((x) => x.message === undefined);
-    const newSuccesses = Array.from(
-      new Set([...successes, ...responseSuccesses.map((x) => x.name)])
-    );
-    setSuccesses(newSuccesses);
-
-    setLoading(false);
-  }, [files, path, bucketName, errors, successes]);
+    // startUpload returns a promise; completion handled in callbacks above
+    await ut.startUpload(filesToUpload);
+  }, [errors, files, successes, ut]);
 
   useEffect(() => {
     if (files.length === 0) {
@@ -190,6 +194,7 @@ const useSupabaseUpload = (options: UseSupabaseUploadOptions) => {
     errors,
     setErrors,
     onUpload,
+    uploadedUrls,
     maxFileSize: maxFileSize,
     maxFiles: maxFiles,
     allowedMimeTypes,

@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { createClient as createBrowserSupabaseClient } from "./client"; // browser-side supabase client factory
+// Supabase storage no longer used for photos; helper functions simplified.
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,41 +23,7 @@ export function generateAccessKey(length = 12): string {
 // Example: storageKey = "weddings/IMG_1234.jpg" =>
 //   https://<project>.supabase.co/storage/v1/object/public/photos/weddings/IMG_1234.jpg
 // If storageKey is empty or env vars missing, returns "".
-export function photoSrc(
-  storageKey: string | null | undefined,
-  width?: number,
-  height?: number,
-  storageBucket?: string
-): string {
-  if (!storageKey) return "";
-  const bucket = storageBucket ?? "photos";
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base) return "";
-
-  // Normalize leading slashes for the storage key
-  const normalized = storageKey.replace(/^\/+/, "");
-
-  try {
-    // We only need a lightweight client; creating a new one per call is fine since getPublicUrl is pure string building.
-    const supabase = createBrowserSupabaseClient();
-    const transform =
-      width || height
-        ? {
-            width: width || undefined,
-            height: height || undefined,
-            resize: "cover" as const, // choose a sensible default; adjust if needed
-          }
-        : undefined;
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(normalized, transform ? { transform } : undefined);
-    return data?.publicUrl || "";
-  } catch {
-    // Fallback to manual construction (legacy behaviour) if anything goes wrong
-    const encoded = normalized
-      .split("/")
-      .map((seg) => encodeURIComponent(seg))
-      .join("/");
-    return `${base}/storage/v1/object/public/${bucket}/${encoded}`;
-  }
+export function photoSrc(storageKey: string | null | undefined): string {
+  // Now storage_key already stores the full public URL (e.g. UploadThing ufsUrl)
+  return storageKey ? String(storageKey) : "";
 }
