@@ -33,8 +33,7 @@ const HomepageGalleriesGrid = async () => {
                     <Image
                       src={
                         photoSrc(gallery.cover_image) ||
-                        photoSrc(gallery.photos[0]?.storage_key) ||
-                        "/placeholder.svg"
+                        photoSrc(gallery.photos[0]?.storage_key)
                       }
                       alt={gallery.title}
                       width={400}
