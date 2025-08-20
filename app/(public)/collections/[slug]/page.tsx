@@ -91,15 +91,12 @@ export default async function PublicCollectionPage({
                           className="relative aspect-square overflow-hidden"
                         >
                           <Image
-                            src={`${
-                              process.env.NEXT_PUBLIC_SUPABASE_URL
-                            }/storage/v1/object/public/photos/${encodeURIComponent(
-                              p.storage_key
-                            )}`}
+                            src={p.storage_key}
                             alt={p.caption || p.filename}
-                            fill
+                            width={100}
+                            height={100}
                             sizes="(max-width:768px) 25vw, (max-width:1200px) 15vw, 10vw"
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="object-cover h-full w-full transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                       ))}
