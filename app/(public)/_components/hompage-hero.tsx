@@ -6,7 +6,7 @@ const HomePageHero = () => {
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background image using Next.js Image for optimization */}
       <Image
-        src="https://ooxvvuililixounsknpj.supabase.co/storage/v1/object/public/photos/4/vice-chancellor.jpg" /* Add this image (optimized ~150-300KB webp) to /public */
+        src="https://ooxvvuililixounsknpj.supabase.co/storage/v1/object/public/photos/IMG_5440.jpg?width=1920&height=1080" /* Add this image (optimized ~150-300KB webp) to /public */
         alt="" /* Decorative background */
         priority
         fill
@@ -19,7 +19,7 @@ const HomePageHero = () => {
       {/* Gradient & overlay to ensure text readability */}
       <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/60 to-stone-700/70" />
       <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-6">
-        <h1 className="text-6xl md:text-7xl font-light tracking-wide mb-6">
+        <h1 className="text-6xl md:text-7xl font-semibold tracking-wide mb-6">
           TK Media
         </h1>
         <p className="text-xl md:text-2xl font-light mb-8 text-stone-200">
