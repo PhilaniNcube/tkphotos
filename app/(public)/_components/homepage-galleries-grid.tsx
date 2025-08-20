@@ -37,9 +37,10 @@ const HomepageGalleriesGrid = async () => {
                         "/placeholder.svg"
                       }
                       alt={gallery.title}
-                      fill
+                      width={400}
+                      height={300}
                       sizes="(max-width:768px) 100vw, (max-width:1200px) 33vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500 w-full h-full"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6 text-white">

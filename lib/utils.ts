@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { createClient as createBrowserSupabaseClient } from "./client"; // browser-side supabase client factory
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,18 +25,39 @@ export function generateAccessKey(length = 12): string {
 // If storageKey is empty or env vars missing, returns "".
 export function photoSrc(
   storageKey: string | null | undefined,
-  options: { bucket?: string } = {}
+  options: { bucket?: string } = {},
+  width?: number,
+  height?: number
 ): string {
   if (!storageKey) return "";
+  const bucket = options.bucket ?? "photos";
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!base) return "";
-  const bucket = options.bucket ?? "photos"; // default bucket name
-  // Normalize: remove any leading slashes so we don't get double slashes in the URL
+
+  // Normalize leading slashes for the storage key
   const normalized = storageKey.replace(/^\/+/, "");
-  // Encode each path segment but keep slashes
-  const encoded = normalized
-    .split("/")
-    .map((seg) => encodeURIComponent(seg))
-    .join("/");
-  return `${base}/storage/v1/object/public/${bucket}/${encoded}`;
+
+  try {
+    // We only need a lightweight client; creating a new one per call is fine since getPublicUrl is pure string building.
+    const supabase = createBrowserSupabaseClient();
+    const transform =
+      width || height
+        ? {
+            width: width || undefined,
+            height: height || undefined,
+            resize: "cover" as const, // choose a sensible default; adjust if needed
+          }
+        : undefined;
+    const { data } = supabase.storage
+      .from(bucket)
+      .getPublicUrl(normalized, transform ? { transform } : undefined);
+    return data?.publicUrl || "";
+  } catch {
+    // Fallback to manual construction (legacy behaviour) if anything goes wrong
+    const encoded = normalized
+      .split("/")
+      .map((seg) => encodeURIComponent(seg))
+      .join("/");
+    return `${base}/storage/v1/object/public/${bucket}/${encoded}`;
+  }
 }
