@@ -18,7 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 // Client wrapper for each photo item to allow selecting cover image
 function CoverCheckbox({
@@ -102,10 +102,10 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
               <span className="italic opacity-70">No description</span>
             )}
             <div className="flex flex-wrap gap-4 text-xs pt-2">
-              {gallery.event_date && <span>Event: {gallery.event_date}</span>}
-              <span>
-                Created: {new Date(gallery.created_at).toLocaleString()}
-              </span>
+              {gallery.event_date && (
+                <span>Event: {format(gallery.event_date, "PP")}</span>
+              )}
+              <span>Created: {format(gallery.created_at, "PP")}</span>
               <span>Access Key: {gallery.access_key}</span>
             </div>
           </CardDescription>
