@@ -23,7 +23,14 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { contactSchema } from "@/lib/schema";
+import { contactSchema, SERVICE_OPTIONS } from "@/lib/schema";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 type ContactValues = z.infer<typeof contactSchema>;
 
@@ -98,9 +105,23 @@ function ContactForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Service (optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. Event Photography" {...field} />
-                  </FormControl>
+                  <Select
+                    onValueChange={(val) => field.onChange(val)}
+                    value={field.value || undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a service" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {SERVICE_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
