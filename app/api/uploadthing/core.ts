@@ -4,7 +4,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   photoUploader: f({
-    image: { maxFileSize: "16MB", maxFileCount: 10 },
+    image: { maxFileSize: "32MB", maxFileCount: 10 },
   }).onUploadComplete(async ({ file }) => {
     // eslint-disable-next-line no-console
     console.log("Uploaded photo", { name: file.name, url: file.ufsUrl });

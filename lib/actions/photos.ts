@@ -54,8 +54,14 @@ export async function createPhotoAction(
       return { success: false, error: error.message };
     }
 
-    // Revalidate dashboard photo listing (adjust path if different in app router)
+    // Revalidate photo & gallery related pages so new images appear without manual refresh
     revalidatePath("/dashboard/photos");
+    if (!Number.isNaN(parsed.data.gallery_id)) {
+      // Revalidate the galleries list & the specific gallery detail page
+      revalidatePath("/dashboard/galleries");
+      revalidatePath(`/dashboard/galleries/${parsed.data.gallery_id}`);
+      revalidatePath(`/dashboard/collections`, "layout");
+    }
     return { success: true, error: null };
   } catch (e) {
     return {

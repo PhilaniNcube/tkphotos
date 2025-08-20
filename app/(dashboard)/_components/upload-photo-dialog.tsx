@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import { createPhotoAction } from "@/lib/actions/photos";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface UploadPhotoDialogProps {
   galleryId: number;
@@ -42,6 +43,16 @@ export function UploadPhotoDialog({
   const [creating, startCreate] = useTransition();
   const [creatingCount, setCreatingCount] = useState(0);
 
+  const router = useRouter();
+
+  // Reset state each time dialog is newly opened (fresh session)
+  useEffect(() => {
+    if (open === true) {
+      setUploaded([]);
+      setCreatingCount(0);
+    }
+  }, [open]);
+
   const handlePersistRecords = async () => {
     // For each successfully uploaded file, create a photo DB record
     if (uploaded.length === 0) {
@@ -66,7 +77,14 @@ export function UploadPhotoDialog({
       }
       if (created === uploaded.length) {
         toast.success(`Added ${created} photo${created > 1 ? "s" : ""}`);
+        // Trigger a client-side refresh so gallery detail (and any other lists) refetch
+        router.refresh();
+        // Close dialog & clear local state
+        setUploaded([]);
         onOpenChange(false);
+      } else if (created > 0) {
+        // Partial success; still refresh to show what succeeded
+        router.refresh();
       }
     });
   };

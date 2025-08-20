@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typedRoutes: true,
   images: {
     qualities: [70, 85, 90],
     remotePatterns: [

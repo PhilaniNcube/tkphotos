@@ -118,16 +118,14 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
             {gallery.cover_image && (
               <div className="flex items-center gap-2">
                 <span className="font-medium">Cover:</span>
-                <Link
-                  href={
-                    gallery.cover_image.startsWith("http")
-                      ? gallery.cover_image
-                      : `#`
-                  }
+                <a
+                  href={gallery.cover_image}
                   className="text-primary underline text-xs"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   {gallery.cover_image}
-                </Link>
+                </a>
               </div>
             )}
           </div>
