@@ -25,12 +25,12 @@ export function generateAccessKey(length = 12): string {
 // If storageKey is empty or env vars missing, returns "".
 export function photoSrc(
   storageKey: string | null | undefined,
-  options: { bucket?: string } = {},
   width?: number,
-  height?: number
+  height?: number,
+  storageBucket?: string
 ): string {
   if (!storageKey) return "";
-  const bucket = options.bucket ?? "photos";
+  const bucket = storageBucket ?? "photos";
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!base) return "";
 
