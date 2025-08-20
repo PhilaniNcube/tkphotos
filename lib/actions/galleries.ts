@@ -17,8 +17,7 @@ export async function createGalleryAction(
       slug: (raw.slug as string) ?? "",
       description: raw.description ? String(raw.description) : null,
       access_key: (raw.access_key as string) ?? "",
-      is_public:
-        raw.is_public === "on" || raw.is_public === "true" ? true : false,
+      is_public: true,
       event_date: raw.event_date ? String(raw.event_date) : null,
       cover_image: raw.cover_image ? String(raw.cover_image) : null,
     };
