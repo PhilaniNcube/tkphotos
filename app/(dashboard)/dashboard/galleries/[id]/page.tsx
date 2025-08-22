@@ -41,7 +41,7 @@ export default async function GalleryPage({ params }: PageProps) {
         >
           ← Back
         </Link>
-        <UploadPhotosButton galleryId={gallery.id} />
+        <UploadPhotosButton galleryId={idNum} />
       </div>
       <GalleryDetail gallery={gallery} />
     </div>
