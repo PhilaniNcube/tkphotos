@@ -20,6 +20,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { deletePhotoAction } from "@/lib/actions/photos";
+import { updateGalleryTitleAction } from "@/lib/actions/galleries";
+import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
 // Client wrapper for each photo item to allow selecting cover image
@@ -72,6 +74,10 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
   const [publicPending, setPublicPending] = React.useState(false);
   const [photos, setPhotos] = React.useState(gallery.photos);
   const [deleting, setDeleting] = React.useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = React.useState(false);
+  const [titleValue, setTitleValue] = React.useState(gallery.title);
+  const [titlePending, setTitlePending] = React.useState(false);
+  const router = useRouter();
 
   async function togglePublic() {
     if (publicPending) return;
@@ -85,7 +91,83 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between gap-4">
-            <span>{gallery.title}</span>
+            <div className="flex items-center gap-2 min-w-0">
+              {!editingTitle ? (
+                <>
+                  <span className="truncate" title={titleValue}>
+                    {titleValue}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingTitle(true)}
+                    className="h-7 text-xs"
+                  >
+                    Edit
+                  </Button>
+                </>
+              ) : (
+                <form
+                  className="flex items-center gap-2"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!titleValue.trim() || titleValue === gallery.title) {
+                      setEditingTitle(false);
+                      setTitleValue((v) => v.trim() || gallery.title);
+                      return;
+                    }
+                    setTitlePending(true);
+                    const fd = new FormData();
+                    fd.append("id", String(gallery.id));
+                    fd.append("title", titleValue.trim());
+                    const res = await updateGalleryTitleAction(
+                      { success: false, error: null },
+                      fd
+                    );
+                    if (!res.success) {
+                      // Basic inline error handling; could use toast
+                      console.error("Failed to update title", res.error);
+                      setTitleValue(gallery.title); // revert
+                    }
+                    setTitlePending(false);
+                    setEditingTitle(false);
+                    router.refresh();
+                  }}
+                >
+                  <input
+                    value={titleValue}
+                    onChange={(e) => setTitleValue(e.target.value)}
+                    autoFocus
+                    maxLength={150}
+                    className="border rounded px-2 py-1 text-sm bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={titlePending}
+                      className="h-7 text-xs"
+                    >
+                      {titlePending ? "Saving..." : "Save"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={titlePending}
+                      onClick={() => {
+                        setEditingTitle(false);
+                        setTitleValue(gallery.title);
+                      }}
+                      className="h-7 text-xs"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
             <div className="flex items-center gap-x-2">
               <Button
                 type="button"

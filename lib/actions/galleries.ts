@@ -66,6 +66,56 @@ type ActionState = {
   fieldErrors?: Record<string, string[]>;
 };
 
+// Server action to update only the title of a gallery.
+export async function updateGalleryTitleAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  try {
+    const raw = Object.fromEntries(formData.entries());
+    const fieldErrors: Record<string, string[]> = {};
+
+    const idRaw = raw.id ?? raw.gallery_id ?? raw.galleryId;
+    const idNum =
+      typeof idRaw === "string" && /^\d+$/.test(idRaw) ? Number(idRaw) : NaN;
+    if (!Number.isInteger(idNum) || idNum <= 0) {
+      fieldErrors.id = ["Valid numeric gallery id required"];
+    }
+
+    const titleRaw = (raw.title as string) ?? "";
+    const title = titleRaw.trim();
+    if (!title) {
+      fieldErrors.title = ["Title is required"];
+    } else if (title.length > 150) {
+      fieldErrors.title = ["Title must be at most 150 characters"];
+    }
+
+    if (Object.keys(fieldErrors).length) {
+      return { success: false, error: "Validation failed", fieldErrors };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("galleries")
+      .update({ title })
+      .eq("id", idNum);
+
+    if (error) return { success: false, error: error.message };
+
+    revalidatePath("/dashboard/galleries");
+    revalidatePath(`/dashboard/galleries/${idNum}`);
+    // Public listing (if any)
+    revalidatePath("/galleries");
+
+    return { success: true, error: null };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Unexpected error",
+    };
+  }
+}
+
 // Server action to update only the cover image of a gallery (can also clear it by submitting empty string)
 export async function updateGalleryCoverImageAction(
   _prevState: ActionState,
