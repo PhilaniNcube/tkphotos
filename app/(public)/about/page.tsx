@@ -17,7 +17,7 @@ export default function AboutPage() {
         <section className="grid gap-10 md:grid-cols-[380px_minmax(0,1fr)] items-start">
           <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden ring-1 ring-stone-300/60 shadow-sm bg-stone-100">
             <Image
-              src="/TK.jpg"
+              src="https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvZFXisQnCMRxelq86Yd95OruyTwQtaIKSNHzB"
               alt="Portrait of Thandikaya Matokazi"
               fill
               priority
