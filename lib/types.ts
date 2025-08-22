@@ -226,6 +226,7 @@ export type Database = {
           gallery_id: number;
           id: string;
           is_featured: boolean;
+          metadata: Json | null;
           storage_key: string;
         };
         Insert: {
@@ -235,6 +236,7 @@ export type Database = {
           gallery_id: number;
           id?: string;
           is_featured?: boolean;
+          metadata?: Json | null;
           storage_key: string;
         };
         Update: {
@@ -244,6 +246,7 @@ export type Database = {
           gallery_id?: number;
           id?: string;
           is_featured?: boolean;
+          metadata?: Json | null;
           storage_key?: string;
         };
         Relationships: [

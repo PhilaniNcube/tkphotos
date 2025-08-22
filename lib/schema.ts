@@ -301,6 +301,19 @@ export const createPhotoSchema = z
       .string()
       .regex(uuidV4Regex, { message: "id must be a valid UUID v4" })
       .optional(),
+    // Optional JSON metadata (e.g. width/height). Keep permissive; Supabase column is jsonb.
+    metadata: z
+      .any()
+      .optional()
+      .refine(
+        (v) => {
+          if (v === undefined || v === null) return true;
+          // Allow primitive, array, or object. Basic recursion limit not enforced here.
+          return true;
+        },
+        { message: "Invalid metadata" }
+      )
+      .nullable(),
   })
   .strict();
 

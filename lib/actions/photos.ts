@@ -27,6 +27,17 @@ export async function createPhotoAction(
       is_featured:
         raw.is_featured === "on" || raw.is_featured === "true" ? true : false,
       id: raw.id ? String(raw.id) : undefined,
+      metadata: (() => {
+        try {
+          if (raw.metadata === undefined || raw.metadata === null)
+            return undefined;
+          // If already an object (could be appended via FormData as Blob?) just return
+          if (typeof raw.metadata === "object") return raw.metadata as any;
+          return JSON.parse(String(raw.metadata));
+        } catch {
+          return undefined; // Ignore bad metadata silently
+        }
+      })(),
     };
 
     const parsed = createPhotoSchema.safeParse(normalized);
@@ -48,6 +59,7 @@ export async function createPhotoAction(
       caption: parsed.data.caption,
       is_featured: parsed.data.is_featured,
       id: parsed.data.id, // optional
+      metadata: parsed.data.metadata ?? null,
     });
 
     if (error) {

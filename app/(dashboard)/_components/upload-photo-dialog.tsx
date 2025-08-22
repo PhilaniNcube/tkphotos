@@ -36,9 +36,9 @@ export function UploadPhotoDialog({
   open,
   onOpenChange,
 }: UploadPhotoDialogProps) {
-  const [uploaded, setUploaded] = useState<{ name: string; ufsUrl: string }[]>(
-    []
-  );
+  const [uploaded, setUploaded] = useState<
+    { name: string; ufsUrl: string; width?: number; height?: number }[]
+  >([]);
   const [uploading, setUploading] = useState(false);
   const [creating, startCreate] = useTransition();
   const [creatingCount, setCreatingCount] = useState(0);
@@ -68,6 +68,12 @@ export function UploadPhotoDialog({
         fd.append("filename", file.name);
         fd.append("storage_key", file.ufsUrl);
         fd.append("gallery_id", String(galleryId));
+        if (file.width && file.height) {
+          fd.append(
+            "metadata",
+            JSON.stringify({ width: file.width, height: file.height })
+          );
+        }
         const res = await createPhotoAction(undefined as any, fd);
         if (res.success) {
           created++;
@@ -105,21 +111,43 @@ export function UploadPhotoDialog({
                   | undefined
               ) => {
                 setUploading(false);
-                console.log(res);
                 if (res) {
-                  // Map UploadThing file responses to our state (ufsUrl or url property)
                   const mapped = res
                     .map((r) => ({
                       name: r.name,
                       ufsUrl: r.ufsUrl ?? r.url ?? "",
                     }))
                     .filter((r) => !!r.ufsUrl);
-                  setUploaded((prev) => [...prev, ...mapped]);
-                  toast.success(
-                    `Uploaded ${mapped.length} file${
-                      mapped.length > 1 ? "s" : ""
-                    }`
-                  );
+
+                  // For each uploaded image, load it to get dimensions
+                  Promise.all(
+                    mapped.map(
+                      (file) =>
+                        new Promise<
+                          typeof file & { width?: number; height?: number }
+                        >((resolve) => {
+                          const img = new Image();
+                          // Attempt to avoid tainting canvas if needed later
+                          img.crossOrigin = "anonymous";
+                          img.onload = () => {
+                            resolve({
+                              ...file,
+                              width: img.naturalWidth,
+                              height: img.naturalHeight,
+                            });
+                          };
+                          img.onerror = () => resolve(file); // fallback without dims
+                          img.src = file.ufsUrl;
+                        })
+                    )
+                  ).then((withDims) => {
+                    setUploaded((prev) => [...prev, ...withDims]);
+                    toast.success(
+                      `Uploaded ${withDims.length} file${
+                        withDims.length > 1 ? "s" : ""
+                      }`
+                    );
+                  });
                 }
               }}
               onUploadError={(error: Error) => {
