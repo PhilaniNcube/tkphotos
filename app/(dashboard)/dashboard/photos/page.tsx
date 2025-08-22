@@ -38,6 +38,14 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
     search,
   });
 
+  function buildHref(targetPage: number) {
+    const params = new URLSearchParams();
+    params.set("page", String(targetPage));
+    params.set("pageSize", String(pageSize));
+    if (search) params.set("search", search);
+    return `/dashboard/photos?${params.toString()}`;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -77,12 +85,7 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-                href={
-                  {
-                    pathname: "/dashboard/photos",
-                    query: { page: Math.max(1, page - 1), pageSize, search },
-                  } as any
-                }
+                href={buildHref(Math.max(1, page - 1))}
                 aria-disabled={page === 1}
                 className={
                   page === 1 ? "pointer-events-none opacity-50" : undefined
@@ -110,15 +113,7 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
                   );
                 return (
                   <PaginationItem key={p}>
-                    <PaginationLink
-                      href={
-                        {
-                          pathname: "/dashboard/photos",
-                          query: { page: p, pageSize, search },
-                        } as any
-                      }
-                      isActive={p === page}
-                    >
+                    <PaginationLink href={buildHref(p)} isActive={p === page}>
                       {p}
                     </PaginationLink>
                   </PaginationItem>
@@ -126,16 +121,7 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
               })}
             <PaginationItem>
               <PaginationNext
-                href={
-                  {
-                    pathname: "/dashboard/photos",
-                    query: {
-                      page: Math.min(pageCount, page + 1),
-                      pageSize,
-                      search,
-                    },
-                  } as any
-                }
+                href={buildHref(Math.min(pageCount, page + 1))}
                 aria-disabled={!hasMore}
                 className={
                   !hasMore ? "pointer-events-none opacity-50" : undefined
