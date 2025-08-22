@@ -32,9 +32,8 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
             <Card className="overflow-hidden group p-0 shadow-sm hover:shadow-md transition-shadow">
               <div className="relative bg-muted">
                 {src ? (
-                  <MeasuredImage
-                    src={src}
-                    alt={p.caption || p.filename}
+                  <PhotoWithKnownDims
+                    photo={p}
                     className="transition-transform duration-300 group-hover:scale-[1.02]"
                   />
                 ) : (
@@ -84,54 +83,41 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
   );
 }
 
-// MeasuredImage: probes natural dimensions first, then renders optimized Next/Image
-function MeasuredImage({
-  src,
-  alt,
+// PhotoWithKnownDims: uses width/height from metadata (populated server-side) without client probing
+function PhotoWithKnownDims({
+  photo,
   className,
 }: {
-  src: string;
-  alt: string;
+  photo: PhotoRow;
   className?: string;
 }) {
-  const [dims, setDims] = React.useState<{ w: number; h: number } | null>(null);
-  React.useEffect(() => {
-    let active = true;
-    const img = new window.Image();
-    img.src = src;
-    img.decoding = "async";
-    img.onload = () => {
-      if (!active) return;
-      const w = img.naturalWidth || 1;
-      const h = img.naturalHeight || 1;
-      setDims({ w, h });
-    };
-    return () => {
-      active = false;
-    };
-  }, [src]);
-
-  const ratioPadding = dims ? (dims.h / dims.w) * 100 : 66.6667; // fallback 3/2
-
+  const meta = (photo.metadata || {}) as Record<string, any>;
+  const origW =
+    typeof meta.width === "number" && meta.width > 0 ? meta.width : 1200;
+  const origH =
+    typeof meta.height === "number" && meta.height > 0 ? meta.height : 800;
+  // Clamp the intrinsic sizing passed to <Image> so Next doesn't consider enormous source dimensions.
+  // Our grid never displays wider than ~400px per item (see sizes attr), so 1000px gives ample Retina headroom.
+  const MAX_BASE_WIDTH = 1000;
+  const scale = origW > MAX_BASE_WIDTH ? MAX_BASE_WIDTH / origW : 1;
+  const w = Math.round(origW * scale);
+  const h = Math.round(origH * scale);
+  const ratioPadding = (origH / origW) * 100; // use original ratio for placeholder box
+  const src = photoSrc(photo.storage_key);
   return (
-    <div className="w-full relative" style={{}}>
-      {/* Aspect box while we wait for dimensions */}
+    <div className="w-full relative">
       <div style={{ paddingTop: `${ratioPadding}%` }} />
       <div className="absolute inset-0">
-        {dims ? (
-          <Image
-            src={src}
-            alt={alt}
-            width={dims.w}
-            height={dims.h}
-            sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
-            className={"object-cover " + (className || "")}
-            placeholder="empty"
-            quality={70}
-          />
-        ) : (
-          <div className="absolute inset-0 animate-pulse bg-accent" />
-        )}
+        <Image
+          src={src}
+          alt={photo.caption || photo.filename}
+          width={w}
+          height={h}
+          sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
+          className={"object-cover " + (className || "")}
+          placeholder="empty"
+          quality={70}
+        />
       </div>
     </div>
   );
