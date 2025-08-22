@@ -122,7 +122,8 @@ function MeasuredImage({
           <Image
             src={src}
             alt={alt}
-            fill
+            width={dims.w}
+            height={dims.h}
             sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
             className={"object-cover " + (className || "")}
             placeholder="empty"
