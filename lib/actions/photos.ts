@@ -70,3 +70,23 @@ export async function createPhotoAction(
     };
   }
 }
+
+// Delete a photo by id (UUID). Revalidates galleries & photos pages.
+export async function deletePhotoAction(photoId: string, galleryId?: number) {
+  try {
+    if (!photoId) throw new Error("Missing photo id");
+    const supabase = await createClient();
+    const { error } = await supabase.from("photos").delete().eq("id", photoId);
+    if (error) return { success: false, error: error.message } as const;
+    // Revalidate generic photo listing and gallery specific pages
+    revalidatePath("/dashboard/photos");
+    if (galleryId) {
+      revalidatePath(`/dashboard/galleries/${galleryId}`);
+      revalidatePath("/dashboard/galleries");
+      revalidatePath("/dashboard/collections", "layout");
+    }
+    return { success: true } as const;
+  } catch (e: any) {
+    return { success: false, error: e?.message || "Unknown error" } as const;
+  }
+}

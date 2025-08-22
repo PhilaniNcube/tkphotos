@@ -19,6 +19,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { deletePhotoAction } from "@/lib/actions/photos";
+import { Trash2 } from "lucide-react";
 
 // Client wrapper for each photo item to allow selecting cover image
 function CoverCheckbox({
@@ -68,6 +70,8 @@ interface GalleryDetailProps {
 
 export function GalleryDetail({ gallery }: GalleryDetailProps) {
   const [publicPending, setPublicPending] = React.useState(false);
+  const [photos, setPhotos] = React.useState(gallery.photos);
+  const [deleting, setDeleting] = React.useState<string | null>(null);
 
   async function togglePublic() {
     if (publicPending) return;
@@ -132,16 +136,14 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
         </CardContent>
       </Card>
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
-          Photos ({gallery.photos.length})
-        </h2>
-        {gallery.photos.length === 0 ? (
+        <h2 className="text-lg font-semibold">Photos ({photos.length})</h2>
+        {photos.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No photos uploaded yet.
           </p>
         ) : (
           <ul className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {gallery.photos.map((p) => {
+            {photos.map((p) => {
               const src = photoSrc(p.storage_key);
               return (
                 <li key={p.id}>
@@ -160,6 +162,18 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
                             galleryId={gallery.id}
                             photoStorageKey={p.storage_key}
                             currentCover={gallery.cover_image}
+                          />
+                          {/* Delete overlay */}
+                          <DeletePhotoButton
+                            photoId={p.id}
+                            galleryId={gallery.id}
+                            onDeleted={() =>
+                              setPhotos((prev) =>
+                                prev.filter((ph) => ph.id !== p.id)
+                              )
+                            }
+                            busy={deleting === p.id}
+                            setBusy={(v) => setDeleting(v ? p.id : null)}
                           />
                         </>
                       ) : (
@@ -198,6 +212,71 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
           </ul>
         )}
       </section>
+    </div>
+  );
+}
+
+function DeletePhotoButton({
+  photoId,
+  galleryId,
+  onDeleted,
+  busy,
+  setBusy,
+}: {
+  photoId: string;
+  galleryId: number;
+  onDeleted: () => void;
+  busy: boolean;
+  setBusy: (b: boolean) => void;
+}) {
+  const [confirming, setConfirming] = React.useState(false);
+
+  async function handleDelete() {
+    setBusy(true);
+    const res = await deletePhotoAction(photoId, galleryId);
+    if (res.success) {
+      onDeleted();
+    } else {
+      // TODO: surface toast; for now console
+      console.error("Delete failed", res.error);
+    }
+    setBusy(false);
+    setConfirming(false);
+  }
+
+  return (
+    <div className="absolute top-1 left-1 z-10 flex flex-col gap-1">
+      {!confirming ? (
+        <button
+          type="button"
+          onClick={() => setConfirming(true)}
+          disabled={busy}
+          className="bg-red-600/80 hover:bg-red-600 text-white rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-40"
+          aria-label="Delete photo"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      ) : (
+        <div className="flex items-center gap-1 bg-black/70 text-white rounded px-1 py-0.5 text-[10px]">
+          <span>Delete?</span>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={busy}
+            className="px-1 rounded bg-red-600 hover:bg-red-500 text-white text-[10px] disabled:opacity-50"
+          >
+            {busy ? "..." : "Yes"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfirming(false)}
+            disabled={busy}
+            className="px-1 rounded bg-zinc-500/60 hover:bg-zinc-500 text-white text-[10px] disabled:opacity-50"
+          >
+            No
+          </button>
+        </div>
+      )}
     </div>
   );
 }
