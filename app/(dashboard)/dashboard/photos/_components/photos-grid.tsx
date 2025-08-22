@@ -127,6 +127,7 @@ function MeasuredImage({
             sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
             className={"object-cover " + (className || "")}
             placeholder="empty"
+            quality={70}
           />
         ) : (
           <div className="absolute inset-0 animate-pulse bg-accent" />
