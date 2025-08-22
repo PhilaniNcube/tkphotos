@@ -56,6 +56,7 @@ export async function createPhotoAction(
 
     // Revalidate photo & gallery related pages so new images appear without manual refresh
     revalidatePath("/dashboard/photos");
+    revalidatePath(`/dashboard/galleries/${parsed.data.gallery_id}`);
     if (!Number.isNaN(parsed.data.gallery_id)) {
       // Revalidate the galleries list & the specific gallery detail page
       revalidatePath("/dashboard/galleries");
