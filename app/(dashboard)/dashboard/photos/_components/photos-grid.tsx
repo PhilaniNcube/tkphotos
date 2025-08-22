@@ -6,6 +6,7 @@ import { photoSrc } from "@/lib/utils";
 import { toggleFeaturedPhotoAction } from "@/lib/actions/photos";
 import { Star, StarOff } from "lucide-react";
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 interface PhotosGridProps {
   photos: PhotoRow[];
@@ -19,23 +20,25 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
     return <p className="text-sm text-muted-foreground">No photos found.</p>;
   }
   return (
-    <ul className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <ul className="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-4 [column-fill:_balance]">
       {items.map((p) => {
         const src = photoSrc(p.storage_key);
         return (
-          <li key={p.id}>
-            <Card className="overflow-hidden group p-0">
-              <div className="relative aspect-video bg-muted">
+          <li
+            key={p.id}
+            className="mb-4 break-inside-avoid relative group focus-within:z-10"
+            style={{ breakInside: "avoid" }}
+          >
+            <Card className="overflow-hidden group p-0 shadow-sm hover:shadow-md transition-shadow">
+              <div className="relative bg-muted">
                 {src ? (
-                  <Image
+                  <MeasuredImage
                     src={src}
                     alt={p.caption || p.filename}
-                    fill
-                    sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105 aspect-video"
+                    className="transition-transform duration-300 group-hover:scale-[1.02]"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">
+                  <div className="w-full aspect-[4/3] flex items-center justify-center text-[10px] text-muted-foreground">
                     No image
                   </div>
                 )}
@@ -58,23 +61,77 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
                     setBusy(null);
                   }}
                 />
+                {/* Hover overlay with filename/date */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100 text-[10px] text-white">
+                  <span className="font-medium truncate" title={p.filename}>
+                    {p.filename}
+                  </span>
+                  <span className="opacity-80">
+                    {new Date(p.created_at).toLocaleDateString()}
+                  </span>
+                </div>
               </div>
-              <CardContent className="p-2 space-y-1 text-xs">
-                <div className="font-medium line-clamp-1" title={p.filename}>
-                  {p.filename}
-                </div>
-                {p.caption && (
-                  <div className="line-clamp-2 opacity-80">{p.caption}</div>
-                )}
-                <div className="flex justify-between opacity-60">
-                  <span>{new Date(p.created_at).toLocaleDateString()}</span>
-                </div>
-              </CardContent>
+              {p.caption && (
+                <CardContent className="p-2 pt-1 text-[11px] leading-snug line-clamp-2 opacity-80">
+                  {p.caption}
+                </CardContent>
+              )}
             </Card>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+// MeasuredImage: probes natural dimensions first, then renders optimized Next/Image
+function MeasuredImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  const [dims, setDims] = React.useState<{ w: number; h: number } | null>(null);
+  React.useEffect(() => {
+    let active = true;
+    const img = new window.Image();
+    img.src = src;
+    img.decoding = "async";
+    img.onload = () => {
+      if (!active) return;
+      const w = img.naturalWidth || 1;
+      const h = img.naturalHeight || 1;
+      setDims({ w, h });
+    };
+    return () => {
+      active = false;
+    };
+  }, [src]);
+
+  const ratioPadding = dims ? (dims.h / dims.w) * 100 : 66.6667; // fallback 3/2
+
+  return (
+    <div className="w-full relative" style={{}}>
+      {/* Aspect box while we wait for dimensions */}
+      <div style={{ paddingTop: `${ratioPadding}%` }} />
+      <div className="absolute inset-0">
+        {dims ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
+            className={"object-cover " + (className || "")}
+            placeholder="empty"
+          />
+        ) : (
+          <div className="absolute inset-0 animate-pulse bg-accent" />
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -90,7 +147,7 @@ function FeatureToggleButton({
   disabled: boolean;
 }) {
   return (
-    <button
+    <Button
       type="button"
       aria-label={isFeatured ? "Unfeature photo" : "Feature photo"}
       disabled={disabled}
@@ -102,6 +159,6 @@ function FeatureToggleButton({
       ) : (
         <StarOff className="size-4" />
       )}
-    </button>
+    </Button>
   );
 }
