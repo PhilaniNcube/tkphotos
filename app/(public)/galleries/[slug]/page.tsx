@@ -85,26 +85,34 @@ export default async function PublicGalleryPage({ params }: GalleryPageProps) {
           </p>
         )}
         {gallery.photos.length > 0 && (
-          <ul className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <ul className="columns-2 gap-4 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 [column-fill:_balance]">
             {gallery.photos.map((p) => {
               const src = photoSrc(p.storage_key);
               return (
                 <li
                   key={p.id}
-                  className="group relative overflow-hidden rounded border bg-card"
+                  className="mb-4 break-inside-avoid group relative overflow-hidden rounded border bg-card"
                 >
                   {src ? (
-                    <div className="relative aspect-[4/3] bg-muted">
+                    <figure className="relative w-full overflow-hidden">
+                      {/* Using fixed width/height placeholder to satisfy next/image; adjust if dimensions become available */}
                       <Image
                         src={src}
                         alt={p.caption || p.filename}
-                        fill
-                        sizes="(max-width:640px) 50vw, (max-width:1280px) 20vw, 15vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        width={800}
+                        height={600}
+                        loading="lazy"
+                        sizes="(max-width:640px) 50vw, (max-width:1280px) 33vw, 20vw"
+                        className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                       />
-                    </div>
+                      {p.is_featured && (
+                        <span className="absolute top-1.5 right-1.5 text-amber-500 drop-shadow-sm">
+                          ★
+                        </span>
+                      )}
+                    </figure>
                   ) : (
-                    <div className="aspect-[4/3] flex items-center justify-center text-[10px] text-muted-foreground">
+                    <div className="flex items-center justify-center text-[10px] text-muted-foreground p-8 bg-muted">
                       No image
                     </div>
                   )}
@@ -125,9 +133,6 @@ export default async function PublicGalleryPage({ params }: GalleryPageProps) {
                     )}
                     <div className="text-[10px] text-muted-foreground flex justify-between">
                       <span>{new Date(p.created_at).toLocaleDateString()}</span>
-                      {p.is_featured && (
-                        <span className="text-amber-600">★</span>
-                      )}
                     </div>
                   </div>
                 </li>
