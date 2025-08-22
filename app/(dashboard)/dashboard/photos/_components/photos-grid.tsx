@@ -7,6 +7,7 @@ import { toggleFeaturedPhotoAction } from "@/lib/actions/photos";
 import { Star, StarOff } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 interface PhotosGridProps {
   photos: PhotoRow[];
@@ -66,7 +67,7 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
                     {p.filename}
                   </span>
                   <span className="opacity-80">
-                    {new Date(p.created_at).toLocaleDateString()}
+                    {format(p.created_at, "MMMM d, yyyy")}
                   </span>
                 </div>
               </div>
