@@ -11,9 +11,10 @@ import { format } from "date-fns";
 
 interface PhotosGridProps {
   photos: PhotoRow[];
+  readonly?: boolean;
 }
 
-export function PhotosGrid({ photos }: PhotosGridProps) {
+export function PhotosGrid({ photos, readonly }: PhotosGridProps) {
   const [items, setItems] = React.useState(photos);
   const [busy, setBusy] = React.useState<string | null>(null);
 
@@ -42,25 +43,27 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
                     No image
                   </div>
                 )}
-                <FeatureToggleButton
-                  id={p.id}
-                  isFeatured={p.is_featured}
-                  disabled={busy === p.id}
-                  onToggle={async (next) => {
-                    setBusy(p.id);
-                    const res = await toggleFeaturedPhotoAction(p.id, next);
-                    if (res.success) {
-                      setItems((prev) =>
-                        prev.map((it) =>
-                          it.id === p.id ? { ...it, is_featured: next } : it
-                        )
-                      );
-                    } else {
-                      console.error("Toggle failed", res.error);
-                    }
-                    setBusy(null);
-                  }}
-                />
+                {!readonly && (
+                  <FeatureToggleButton
+                    id={p.id}
+                    isFeatured={p.is_featured}
+                    disabled={busy === p.id}
+                    onToggle={async (next) => {
+                      setBusy(p.id);
+                      const res = await toggleFeaturedPhotoAction(p.id, next);
+                      if (res.success) {
+                        setItems((prev) =>
+                          prev.map((it) =>
+                            it.id === p.id ? { ...it, is_featured: next } : it
+                          )
+                        );
+                      } else {
+                        console.error("Toggle failed", res.error);
+                      }
+                      setBusy(null);
+                    }}
+                  />
+                )}
                 {/* Hover overlay with filename/date */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100 text-[10px] text-white">
                   <span className="font-medium truncate" title={p.filename}>

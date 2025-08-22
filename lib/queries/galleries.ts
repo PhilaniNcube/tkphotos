@@ -176,6 +176,8 @@ export interface GalleryWithPhotos extends GalleryRow {
     caption: string | null;
     created_at: string;
     is_featured: boolean;
+    metadata?: any | null;
+    gallery_id?: number;
   }[];
 }
 
@@ -189,7 +191,9 @@ export async function getGalleryWithPhotos(
   const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500);
   const { data: photos } = await supabase
     .from("photos")
-    .select("id,filename,storage_key,caption,created_at,is_featured")
+    .select(
+      "id,filename,storage_key,caption,created_at,is_featured,metadata,gallery_id"
+    )
     .eq("gallery_id", id)
     .order("created_at", { ascending: false })
     .limit(limit);

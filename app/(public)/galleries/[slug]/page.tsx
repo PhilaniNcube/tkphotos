@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { photoSrc } from "@/lib/utils";
+import { PhotosGrid } from "@/app/(dashboard)/dashboard/photos/_components/photos-grid";
 import {
   getGalleryBySlug,
   getGalleryWithPhotos,
@@ -79,66 +78,13 @@ export default async function PublicGalleryPage({ params }: GalleryPageProps) {
         </div>
       </header>
       <section className="space-y-4">
-        {gallery.photos.length === 0 && (
+        {gallery.photos.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No photos have been added to this gallery yet.
           </p>
-        )}
-        {gallery.photos.length > 0 && (
-          <ul className="columns-2 gap-4 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 [column-fill:_balance]">
-            {gallery.photos.map((p) => {
-              const src = photoSrc(p.storage_key);
-              return (
-                <li
-                  key={p.id}
-                  className="mb-4 break-inside-avoid group relative overflow-hidden rounded border bg-card"
-                >
-                  {src ? (
-                    <figure className="relative w-full overflow-hidden">
-                      {/* Using fixed width/height placeholder to satisfy next/image; adjust if dimensions become available */}
-                      <Image
-                        src={src}
-                        alt={p.caption || p.filename}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        sizes="(max-width:640px) 50vw, (max-width:1280px) 33vw, 20vw"
-                        className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                      />
-                      {p.is_featured && (
-                        <span className="absolute top-1.5 right-1.5 text-amber-500 drop-shadow-sm">
-                          ★
-                        </span>
-                      )}
-                    </figure>
-                  ) : (
-                    <div className="flex items-center justify-center text-[10px] text-muted-foreground p-8 bg-muted">
-                      No image
-                    </div>
-                  )}
-                  <div className="p-2 space-y-1">
-                    <div
-                      className="text-[11px] font-medium line-clamp-1"
-                      title={p.filename}
-                    >
-                      {p.filename}
-                    </div>
-                    {p.caption && (
-                      <div
-                        className="text-[10px] text-muted-foreground line-clamp-2"
-                        title={p.caption}
-                      >
-                        {p.caption}
-                      </div>
-                    )}
-                    <div className="text-[10px] text-muted-foreground flex justify-between">
-                      <span>{new Date(p.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+        ) : (
+          // Cast because gallery.photos includes subset + metadata; component only reads needed fields
+          <PhotosGrid photos={gallery.photos as any} readonly />
         )}
       </section>
     </div>
