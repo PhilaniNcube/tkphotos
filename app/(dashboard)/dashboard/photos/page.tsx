@@ -1,4 +1,6 @@
 import { getPhotosPaginated } from "@/lib/queries/photos";
+import { getAdmin } from "@/lib/queries/user";
+import { UpdateMetadataButton } from "@/app/(dashboard)/dashboard/photos/_components/update-metadata-button";
 import { createSearchParamsCache, parseAsInteger } from "nuqs/server";
 import { PhotosFilters } from "@/app/(dashboard)/dashboard/photos/_components/photos-filters";
 import { PhotosGrid } from "@/app/(dashboard)/dashboard/photos/_components/photos-grid";
@@ -37,6 +39,7 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
     pageSize,
     search,
   });
+  const isAdmin = await getAdmin();
 
   function buildHref(targetPage: number) {
     const params = new URLSearchParams();
@@ -73,6 +76,7 @@ export default async function DashboardPhotosPage({ searchParams }: PageProps) {
           >
             Refresh
           </Link>
+          <UpdateMetadataButton admin={!!isAdmin} />
         </div>
       </div>
       <PhotosFilters pageSize={pageSize} search={search} />
