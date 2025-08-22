@@ -19,8 +19,38 @@ export async function createPhotoAction(
   try {
     const raw = Object.fromEntries(formData.entries());
 
+    console.log("Raw form data:", raw);
+
+    // Auto-sanitize filename so that uploads coming from providers that inject
+    // spaces or other characters (e.g. "My Photo (1).JPG") don't fail schema validation.
+    // Allowed chars per schema: letters, numbers, dot, underscore, hyphen.
+    const sanitizeFilename = (name: string | undefined | null): string => {
+      if (!name) return "file"; // fallback
+      // Replace disallowed chars with underscore, collapse repeats, trim underscores at ends.
+      let cleaned = name
+        .trim()
+        .replace(/[^A-Za-z0-9._-]+/g, "_")
+        .replace(/_+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      if (cleaned.length === 0) cleaned = "file";
+      // Cap length to 200 (schema limit) preserving extension if possible.
+      if (cleaned.length > 200) {
+        const parts = cleaned.split(".");
+        if (parts.length > 1) {
+          const ext = parts.pop();
+          // Recompute base ensuring room for dot+ext
+          const maxBase = 200 - (ext ? ext.length + 1 : 0);
+          cleaned = parts.join(".").slice(0, Math.max(1, maxBase));
+          cleaned = `${cleaned}.${ext}`;
+        } else {
+          cleaned = cleaned.slice(0, 200);
+        }
+      }
+      return cleaned;
+    };
+
     const normalized = {
-      filename: (raw.filename as string) ?? "",
+      filename: sanitizeFilename(raw.filename as string),
       storage_key: (raw.storage_key as string) ?? "",
       gallery_id: raw.gallery_id ? Number(raw.gallery_id) : NaN,
       caption: raw.caption ? String(raw.caption) : null,
@@ -42,6 +72,7 @@ export async function createPhotoAction(
 
     const parsed = createPhotoSchema.safeParse(normalized);
     if (!parsed.success) {
+      console.log("Validation failed:", parsed.error);
       const fieldErrors: Record<string, string[]> = {};
       for (const issue of parsed.error.issues) {
         const key = issue.path.join(".") || "form";

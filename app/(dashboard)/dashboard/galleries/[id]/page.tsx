@@ -1,3 +1,7 @@
+// Force dynamic rendering so newly uploaded photos appear immediately after
+// revalidatePath or router.refresh without waiting for stale cache.
+export const dynamic = "force-dynamic"; // Next.js 15
+// (Alternative: export const revalidate = 0;)
 import { getGalleryWithPhotos } from "@/lib/queries/galleries";
 import { UploadPhotosButton } from "./_components/upload-photos-button";
 import { GalleryDetail } from "./_components/gallery-detail";

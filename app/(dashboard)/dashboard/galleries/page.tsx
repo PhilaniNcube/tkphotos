@@ -1,3 +1,5 @@
+// Force dynamic rendering so gallery list reflects new photos/galleries right away.
+export const dynamic = "force-dynamic";
 import { getGalleriesCursorPage } from "../../../../lib/queries/galleries";
 import { createSearchParamsCache, parseAsInteger } from "nuqs/server";
 import Link from "next/link";
@@ -85,7 +87,7 @@ export default async function DashboardGalleriesPage({
       )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {data.map((g) => {
-          const href = `/dashboard/galleries/${g.id}`;
+          const href = `/dashboard/galleries/${g.id}` as any; // cast for typedRoutes dynamic segment
           return (
             <Link
               key={g.id}
