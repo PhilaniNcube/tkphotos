@@ -91,3 +91,23 @@ export async function deletePhotoAction(photoId: string, galleryId?: number) {
     return { success: false, error: e?.message || "Unknown error" } as const;
   }
 }
+
+// Toggle photo featured flag. Returns new value on success.
+export async function toggleFeaturedPhotoAction(
+  photoId: string,
+  value: boolean
+) {
+  try {
+    if (!photoId) throw new Error("Missing photo id");
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("photos")
+      .update({ is_featured: value })
+      .eq("id", photoId);
+    if (error) return { success: false, error: error.message } as const;
+    revalidatePath("/dashboard/photos");
+    return { success: true, value } as const;
+  } catch (e: any) {
+    return { success: false, error: e?.message || "Unknown error" } as const;
+  }
+}

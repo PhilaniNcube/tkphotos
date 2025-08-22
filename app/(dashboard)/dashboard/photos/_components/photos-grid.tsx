@@ -1,19 +1,26 @@
+"use client";
 import { PhotoRow } from "@/lib/queries/photos";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { photoSrc } from "@/lib/utils";
+import { toggleFeaturedPhotoAction } from "@/lib/actions/photos";
+import { Star, StarOff } from "lucide-react";
+import React from "react";
 
 interface PhotosGridProps {
   photos: PhotoRow[];
 }
 
 export function PhotosGrid({ photos }: PhotosGridProps) {
-  if (!photos.length) {
+  const [items, setItems] = React.useState(photos);
+  const [busy, setBusy] = React.useState<string | null>(null);
+
+  if (!items.length) {
     return <p className="text-sm text-muted-foreground">No photos found.</p>;
   }
   return (
     <ul className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {photos.map((p) => {
+      {items.map((p) => {
         const src = photoSrc(p.storage_key);
         return (
           <li key={p.id}>
@@ -32,11 +39,25 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
                     No image
                   </div>
                 )}
-                {p.is_featured && (
-                  <span className="absolute top-1 left-1 rounded bg-amber-500/80 text-[10px] px-1 py-0.5 text-white">
-                    Featured
-                  </span>
-                )}
+                <FeatureToggleButton
+                  id={p.id}
+                  isFeatured={p.is_featured}
+                  disabled={busy === p.id}
+                  onToggle={async (next) => {
+                    setBusy(p.id);
+                    const res = await toggleFeaturedPhotoAction(p.id, next);
+                    if (res.success) {
+                      setItems((prev) =>
+                        prev.map((it) =>
+                          it.id === p.id ? { ...it, is_featured: next } : it
+                        )
+                      );
+                    } else {
+                      console.error("Toggle failed", res.error);
+                    }
+                    setBusy(null);
+                  }}
+                />
               </div>
               <CardContent className="p-2 space-y-1 text-xs">
                 <div className="font-medium line-clamp-1" title={p.filename}>
@@ -54,5 +75,33 @@ export function PhotosGrid({ photos }: PhotosGridProps) {
         );
       })}
     </ul>
+  );
+}
+
+function FeatureToggleButton({
+  id,
+  isFeatured,
+  onToggle,
+  disabled,
+}: {
+  id: string;
+  isFeatured: boolean;
+  onToggle: (next: boolean) => void | Promise<void>;
+  disabled: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={isFeatured ? "Unfeature photo" : "Feature photo"}
+      disabled={disabled}
+      onClick={() => onToggle(!isFeatured)}
+      className="absolute top-1 left-1 z-10 inline-flex items-center justify-center rounded bg-black/60 hover:bg-black/80 text-white p-1 transition-opacity opacity-0 group-hover:opacity-100 disabled:opacity-40"
+    >
+      {isFeatured ? (
+        <Star className="size-4 fill-amber-400 text-amber-400" />
+      ) : (
+        <StarOff className="size-4" />
+      )}
+    </button>
   );
 }
