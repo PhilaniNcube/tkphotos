@@ -94,10 +94,12 @@ export async function updateGalleryTitleAction(
       return { success: false, error: "Validation failed", fieldErrors };
     }
 
+    // update the gallery slug using the new title
+    const slug = title.toLowerCase().replace(/\s+/g, "-");
     const supabase = await createClient();
     const { error } = await supabase
       .from("galleries")
-      .update({ title })
+      .update({ title, slug })
       .eq("id", idNum);
 
     if (error) return { success: false, error: error.message };
