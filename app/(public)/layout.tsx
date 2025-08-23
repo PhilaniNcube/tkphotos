@@ -19,9 +19,9 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
       </Link>
       <header className="sticky top-0 z-40 w-full border-b bg-white backdrop-blur supports-[backdrop-filter]:bg-background/50">
         <div className="container flex h-16 items-center justify-between mx-auto px-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <div className="flex gap-x-2 items-center">
-              <MobileMenu />
+          <div className="flex gap-x-2 items-center">
+            <MobileMenu />
+            <Link href="/" className="flex items-center gap-2 font-semibold">
               <Image
                 src="/logo.webp"
                 alt="TK Media"
@@ -29,8 +29,8 @@ const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
                 height={604}
                 className="w-18 object-cover"
               />
-            </div>
-          </Link>
+            </Link>
+          </div>
           {/* Desktop nav */}
           <nav className="hidden md:block">
             <NavLinks />
