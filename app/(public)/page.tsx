@@ -3,6 +3,7 @@ import HomePageHero from "./_components/hompage-hero";
 import FeaturedPhotos from "./_components/featured-photos";
 import HomepageGalleriesGrid from "./_components/homepage-galleries-grid";
 import CollectionsCTA from "./_components/collections-cta";
+import Testimonials from "./_components/testimonials";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <FeaturedPhotos />
       <HomepageGalleriesGrid />
       <CollectionsCTA />
+      <Testimonials />
     </>
   );
 }
