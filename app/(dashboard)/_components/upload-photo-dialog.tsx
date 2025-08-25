@@ -53,7 +53,7 @@ export function UploadPhotoDialog({
     }
   }, [open]);
 
-  const handlePersistRecords = async () => {
+  const handlePersistRecords = () => {
     // For each successfully uploaded file, create a photo DB record
     if (uploaded.length === 0) {
       toast.error("No uploaded files to persist");
@@ -83,14 +83,14 @@ export function UploadPhotoDialog({
       }
       if (created === uploaded.length) {
         toast.success(`Added ${created} photo${created > 1 ? "s" : ""}`);
-        // Trigger a client-side refresh so gallery detail (and any other lists) refetch
-        router.refresh();
         // Close dialog & clear local state
         setUploaded([]);
         onOpenChange(false);
       } else if (created > 0) {
-        // Partial success; still refresh to show what succeeded
-        router.refresh();
+        // Partial success; let user know
+        toast.info(
+          `Successfully added ${created} of ${uploaded.length} photos`
+        );
       }
     });
   };
