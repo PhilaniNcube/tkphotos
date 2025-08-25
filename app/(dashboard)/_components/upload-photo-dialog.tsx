@@ -83,11 +83,14 @@ export function UploadPhotoDialog({
       }
       if (created === uploaded.length) {
         toast.success(`Added ${created} photo${created > 1 ? "s" : ""}`);
+        // Force a router refresh to ensure the gallery page shows new photos
+        router.refresh();
         // Close dialog & clear local state
         setUploaded([]);
         onOpenChange(false);
       } else if (created > 0) {
-        // Partial success; let user know
+        // Partial success; still refresh to show what succeeded
+        router.refresh();
         toast.info(
           `Successfully added ${created} of ${uploaded.length} photos`
         );

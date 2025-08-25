@@ -79,6 +79,16 @@ export function GalleryDetail({ gallery }: GalleryDetailProps) {
   const [titlePending, setTitlePending] = React.useState(false);
   const router = useRouter();
 
+  // Sync local photos state when gallery prop changes (e.g., after router.refresh())
+  React.useEffect(() => {
+    setPhotos(gallery.photos);
+  }, [gallery.photos]);
+
+  // Sync title when gallery prop changes
+  React.useEffect(() => {
+    setTitleValue(gallery.title);
+  }, [gallery.title]);
+
   async function togglePublic() {
     if (publicPending) return;
     setPublicPending(true);
