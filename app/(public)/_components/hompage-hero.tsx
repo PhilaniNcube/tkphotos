@@ -22,10 +22,7 @@ const heroImages = [
     src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvP1dFiygiyHLlD9c1F6kOV073etrpfmnzqKJd",
     alt: "Nature photography",
   },
-  {
-    src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvqL0Ord8udkRx10Mw8BZtsQTehfXa25DPmzLY",
-    alt: "Sports & Action Photography",
-  },
+
   {
     src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxv4cBfHfsyqYrMLSTDF2ERoyNwCh1d0fQsGBiA",
     alt: "Wedding Photography",
