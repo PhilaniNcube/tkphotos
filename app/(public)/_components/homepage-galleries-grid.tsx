@@ -54,10 +54,6 @@ const HomepageGalleriesGrid = async () => {
                           {gallery.description}
                         </p>
                       )}
-                      <p className="text-stone-300 text-xs mt-2">
-                        {gallery.photos.length} photo
-                        {gallery.photos.length === 1 ? "" : "s"}
-                      </p>
                     </div>
                   </div>
                 </CardContent>

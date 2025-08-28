@@ -95,10 +95,10 @@ const HomePageHero = () => {
             <h1 className="text-6xl md:text-7xl font-semibold tracking-wide mb-6">
               TK Media
             </h1>
-            <p className="text-xl md:text-2xl font-light mb-8 text-stone-200">
+            <p className="text-xl md:text-2xl mb-8 text-stone-200">
               Event Photography & Videography
             </p>
-            <p className="text-lg text-stone-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-stone-300 font-medium max-w-2xl mx-auto leading-relaxed">
               Professional photography and videography services for all your
               events, capturing moments that matter.
             </p>
