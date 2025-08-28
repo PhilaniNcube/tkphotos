@@ -15,6 +15,10 @@ import Autoplay from "embla-carousel-autoplay";
 // Sample hero images - in production, these could come from featured photos
 const heroImages = [
   {
+    src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvHp3Ev2uPJ1zb6YVQ7X8wASmdhyxevWU2tL4K",
+    alt: "Sunset",
+  },
+  {
     src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxv8VDE0SCZ2cukOPCKHZ1tJvA3arexRl7bqd4I",
     alt: "Professional photography",
   },
@@ -72,7 +76,7 @@ const HomePageHero = () => {
                   className="object-cover object-center"
                   placeholder="blur"
                   blurDataURL="data:image/webp;base64,UklGRiIAAABXRUJQVlA4ICAAAAAwAQCdASoEAAQAAVAfCWkAANwAP7mIAA=="
-                  quality={70}
+                  quality={50}
                 />
                 {/* Gradient overlay for text readability */}
                 <div className="absolute inset-0 bg-gradient-to-br from-stone-900/90 via-stone-900/60 to-stone-700/70" />
@@ -96,10 +100,6 @@ const HomePageHero = () => {
             </p>
           </div>
         </div>
-
-        {/* Navigation arrows */}
-        <CarouselPrevious className="left-4 top-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white" />
-        <CarouselNext className="right-4 top-1/2 bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white" />
 
         {/* Dot indicators */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">

@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   images: {
-    qualities: [70, 80, 85, 90],
+    qualities: [50, 70, 80, 85, 90],
     remotePatterns: [
       {
         protocol: "https",
