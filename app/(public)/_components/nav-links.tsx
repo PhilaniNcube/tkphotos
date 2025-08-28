@@ -37,12 +37,12 @@ const NavLinks = () => {
             .from("galleries")
             .select("slug,title,is_public,created_at")
             .eq("is_public", true)
-            .order("created_at", { ascending: false })
+            .order("title", { ascending: false })
             .limit(15),
           supabase
             .from("collections")
             .select("slug,name,created_at")
-            .order("created_at", { ascending: false })
+            .order("name", { ascending: false })
             .limit(15),
         ]);
         if (gals.error) throw gals.error;
@@ -85,7 +85,7 @@ const NavLinks = () => {
           <NavigationMenuItem key={l.href}>
             <NavigationMenuLink asChild data-active={isActive(l.href)}>
               <Link
-                href={l.href}
+                href={l.href as any}
                 className={
                   "block rounded-md px-3 py-2 text-sm font-medium transition-colors bg-transparent hover:bg-accent hover:text-accent-foreground md:px-3 md:py-2 " +
                   (isActive(l.href) ? "text-primary" : "text-muted-foreground")
@@ -133,7 +133,7 @@ const NavLinks = () => {
                     className="data-[active=true]:bg-accent/60"
                   >
                     <Link
-                      href={href}
+                      href={href as any}
                       className={
                         "rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground " +
                         (active ? "text-primary" : "text-muted-foreground")
@@ -192,7 +192,7 @@ const NavLinks = () => {
                     className="data-[active=true]:bg-accent/60"
                   >
                     <Link
-                      href={href}
+                      href={href as any}
                       className={
                         "rounded-sm px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground " +
                         (active ? "text-primary" : "text-muted-foreground")
