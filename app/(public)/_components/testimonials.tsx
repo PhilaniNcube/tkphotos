@@ -28,12 +28,13 @@ const testimonials: Testimonial[] = [
       "TK Photography was a pleasure to work with for our annual tech conference. Their team was professional, creative, and captured the energy of the event perfectly. The photos were delivered ahead of schedule and exceeded our expectations. We highly recommend them for any corporate event.",
     rating: 5,
   },
+
   {
     id: 3,
-    name: "Emily Rodriguez",
-    role: "Family Portrait Client",
+    name: "Bulumnko",
+    role: "Event Client",
     content:
-      "The family portraits were absolutely stunning. TK has an amazing ability to capture genuine emotions and create lasting memories.",
+      "Great photographer, on time and understanding of event/venue problems while on site. Often, price is achievable through consultation with the company but most importantly, quality of the pictures is outstanding and provides on site/same time delivery at times.",
     rating: 5,
   },
 ];
