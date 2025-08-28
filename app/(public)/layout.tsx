@@ -5,6 +5,8 @@ import MobileMenu from "./_components/mobile-menu";
 import { getCurrentUser } from "@/lib/queries/user";
 import UserButton from "./_components/user-button";
 import Image from "next/image";
+import { Instagram, Facebook } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
 
 const PublicLayout = async ({ children }: { children: React.ReactNode }) => {
   const userData = await getCurrentUser();
@@ -56,13 +58,49 @@ const Footer = () => {
         <p className="text-muted-foreground">
           &copy; {new Date().getFullYear()} TK Media. All rights reserved.
         </p>
-        <div className="flex gap-4 text-muted-foreground">
-          <Link href="/privacy" className="hover:text-primary">
-            Privacy
-          </Link>
-          <Link href="/terms" className="hover:text-primary">
-            Terms
-          </Link>
+
+        {/* Social Media Links */}
+        <div className="flex items-center gap-6">
+          <div className="flex gap-4 items-center">
+            <Link
+              href="https://www.tiktok.com/@thandikayamatokazizizi?_t=ZM-8zGISpU5Osw&_r=1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Follow us on TikTok"
+            >
+              <FaTiktok className="h-5 w-5" />
+            </Link>
+
+            <Link
+              href="https://www.instagram.com/tkphotography_and_videography?igsh=aWp3bjd5NzA0cjF1&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Follow us on Instagram"
+            >
+              <Instagram className="h-5 w-5" />
+            </Link>
+
+            <Link
+              href="https://www.facebook.com/share/1DchY5rHjk/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-primary transition-colors"
+              aria-label="Follow us on Facebook"
+            >
+              <Facebook className="h-5 w-5" />
+            </Link>
+          </div>
+
+          <div className="flex gap-4 text-muted-foreground">
+            <Link href="/privacy" className="hover:text-primary">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-primary">
+              Terms
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
