@@ -23,6 +23,10 @@ const heroImages = [
     alt: "Professional photography",
   },
   {
+    src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvs6r8S60MxNnfSJ1LF2w7eUsGP9R4QBmzIkbg",
+    alt: "Birds",
+  },
+  {
     src: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvP1dFiygiyHLlD9c1F6kOV073etrpfmnzqKJd",
     alt: "Nature photography",
   },
