@@ -1,17 +1,10 @@
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 import { pageview } from "@/lib/analytics";
 
-export const useAnalytics = () => {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+export const useAnalytics = (url: string) => {
   useEffect(() => {
-    if (pathname) {
-      const url =
-        pathname +
-        (searchParams.toString() ? `?${searchParams.toString()}` : "");
+    if (url) {
       pageview(url);
     }
-  }, [pathname, searchParams]);
+  }, [url]);
 };
