@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { submitContact } from "@/lib/actions/contact";
+import { trackContactForm, trackServiceInquiry } from "@/lib/analytics";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,15 @@ function ContactForm() {
         setServerError(error);
         return;
       }
+
+      // Track successful contact form submission
+      trackContactForm();
+
+      // Track service inquiry if service is specified
+      if (values.service) {
+        trackServiceInquiry(values.service);
+      }
+
       setSuccess(true);
       form.reset();
     });
