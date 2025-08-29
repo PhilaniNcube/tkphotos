@@ -5,7 +5,43 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy Policy | TK Media",
   description:
-    "Privacy policy for TK Media photography services, detailing how we collect, use, and protect your personal information and images.",
+    "Privacy policy for TK Media photography services, detailing how we collect, use, and protect your personal information and images in compliance with data protection regulations.",
+  keywords: [
+    "privacy policy",
+    "data protection",
+    "photography privacy",
+    "image rights",
+    "personal information",
+    "GDPR compliance",
+    "photo privacy",
+  ],
+  openGraph: {
+    title: "Privacy Policy | TK Media",
+    description:
+      "Privacy policy detailing how TK Media collects, uses, and protects your personal information and images.",
+    type: "website",
+    images: [
+      {
+        url: "/logo.webp",
+        width: 799,
+        height: 604,
+        alt: "TK Media Privacy Policy",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Privacy Policy | TK Media",
+    description:
+      "Privacy policy detailing how TK Media protects your personal information and images.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

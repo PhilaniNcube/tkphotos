@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useTransition, useState } from "react";
+import type { Metadata } from "next";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PhotosGrid } from "@/app/(dashboard)/dashboard/photos/_components/photos-grid";
 import {
@@ -7,6 +8,74 @@ import {
 } from "@/lib/queries/galleries";
 
 type GalleryPageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({
+  params,
+}: GalleryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const gallery = await getGalleryBySlug(slug);
+
+  if (!gallery || !gallery.is_public) {
+    return {
+      title: "Gallery Not Found | TK Media",
+      description:
+        "The requested gallery was not found or is not publicly available.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const galleryTitle = gallery.title || "Untitled Gallery";
+  const galleryDescription =
+    gallery.description ||
+    `View photos from the ${galleryTitle} gallery by TK Media professional photography.`;
+
+  return {
+    title: `${galleryTitle} | TK Media Gallery`,
+    description: galleryDescription,
+    keywords: [
+      "photo gallery",
+      galleryTitle,
+      "TK Media",
+      "professional photography",
+      "Eastern Cape photographer",
+      "photography portfolio",
+    ],
+    openGraph: {
+      title: `${galleryTitle} | TK Media Gallery`,
+      description: galleryDescription,
+      type: "website",
+      images: gallery.cover_image
+        ? [
+            {
+              url: gallery.cover_image,
+              width: 1200,
+              height: 800,
+              alt: `Featured image from ${galleryTitle}`,
+            },
+          ]
+        : [
+            {
+              url: "/logo.webp",
+              width: 799,
+              height: 604,
+              alt: `${galleryTitle} - TK Media`,
+            },
+          ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${galleryTitle} | TK Media`,
+      description: galleryDescription,
+      images: gallery.cover_image ? [gallery.cover_image] : ["/logo.webp"],
+    },
+    alternates: {
+      canonical: `/galleries/${slug}`,
+    },
+  };
+}
 
 export default async function PublicGalleryPage({ params }: GalleryPageProps) {
   const { slug } = await params;

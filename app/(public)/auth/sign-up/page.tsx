@@ -1,4 +1,24 @@
-import { SignUpForm } from '@/components/sign-up-form'
+import type { Metadata } from "next";
+import { SignUpForm } from "@/components/sign-up-form";
+
+export const metadata: Metadata = {
+  title: "Sign Up | TK Media",
+  description:
+    "Create an account to access your private photo galleries and downloads from TK Media photography services.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: "Sign Up | TK Media",
+    description:
+      "Create an account to access your private photo galleries and downloads.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/auth/sign-up",
+  },
+};
 
 export default function Page() {
   return (
@@ -7,5 +27,5 @@ export default function Page() {
         <SignUpForm />
       </div>
     </div>
-  )
+  );
 }

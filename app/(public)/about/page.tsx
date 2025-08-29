@@ -4,9 +4,45 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "About | TK Media",
+  title: "About Thandikaya Matokazi | TK Media",
   description:
-    "Learn about Thandikaya Matokazi – Eastern Cape photographer with 6+ years experience capturing events, families, sport and corporate stories.",
+    "Meet Thandikaya Matokazi, professional photographer with 6+ years experience capturing authentic moments in events, families, sports and corporate photography in Eastern Cape, South Africa.",
+  keywords: [
+    "Thandikaya Matokazi",
+    "professional photographer",
+    "Eastern Cape photographer",
+    "South African photographer",
+    "photography experience",
+    "event photographer",
+    "family photographer",
+    "sports photographer",
+  ],
+  openGraph: {
+    title: "About Thandikaya Matokazi | TK Media",
+    description:
+      "Meet Thandikaya Matokazi, professional photographer with 6+ years experience capturing authentic moments in Eastern Cape, South Africa.",
+    type: "profile",
+    images: [
+      {
+        url: "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvZFXisQnCMRxelq86Yd95OruyTwQtaIKSNHzB",
+        width: 800,
+        height: 1000,
+        alt: "Portrait of Thandikaya Matokazi, Professional Photographer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Thandikaya Matokazi | TK Media",
+    description:
+      "Meet Thandikaya Matokazi, professional photographer with 6+ years experience capturing authentic moments.",
+    images: [
+      "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvZFXisQnCMRxelq86Yd95OruyTwQtaIKSNHzB",
+    ],
+  },
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {

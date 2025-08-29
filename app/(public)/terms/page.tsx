@@ -5,7 +5,43 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms of Service | TK Media",
   description:
-    "Terms of service for TK Media photography services, including client galleries, downloads, and usage rights.",
+    "Terms of service for TK Media photography services, including client galleries, downloads, usage rights, and service agreements for professional photography.",
+  keywords: [
+    "terms of service",
+    "photography terms",
+    "client galleries terms",
+    "usage rights",
+    "photography contract",
+    "service agreement",
+    "photo licensing",
+  ],
+  openGraph: {
+    title: "Terms of Service | TK Media",
+    description:
+      "Terms of service for TK Media photography services, including client galleries, downloads, and usage rights.",
+    type: "website",
+    images: [
+      {
+        url: "/logo.webp",
+        width: 799,
+        height: 604,
+        alt: "TK Media Terms of Service",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Terms of Service | TK Media",
+    description:
+      "Terms of service for TK Media photography services and client galleries.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default function TermsPage() {

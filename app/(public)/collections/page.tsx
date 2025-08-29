@@ -1,5 +1,44 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getAllCollections } from "@/lib/queries/collections";
+
+export const metadata: Metadata = {
+  title: "Photo Collections | TK Media",
+  description:
+    "Explore curated photo collections showcasing the best of TK Media's professional photography work across various events and occasions.",
+  keywords: [
+    "photo collections",
+    "curated photography",
+    "professional photos",
+    "photography showcase",
+    "TK Media collections",
+    "Eastern Cape photography",
+  ],
+  openGraph: {
+    title: "Photo Collections | TK Media",
+    description:
+      "Explore curated photo collections showcasing the best of TK Media's professional photography work.",
+    type: "website",
+    images: [
+      {
+        url: "/logo.webp",
+        width: 799,
+        height: 604,
+        alt: "TK Media Photo Collections",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Photo Collections | TK Media",
+    description:
+      "Explore curated photo collections showcasing the best of TK Media's professional photography work.",
+    images: ["/logo.webp"],
+  },
+  alternates: {
+    canonical: "/collections",
+  },
+};
 
 // Public Collections Listing
 // Displays all collections (could filter to public-only if a flag existed; assuming all collections are public facing here)

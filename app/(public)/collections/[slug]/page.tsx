@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getCollectionGalleries } from "@/lib/queries/collections";
 import { getRecentPhotosForGalleries } from "@/lib/queries/photos";
 import Image from "next/image";
@@ -5,6 +6,65 @@ import Link from "next/link";
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CollectionPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const collection = await getCollectionGalleries(slug);
+
+  if (!collection) {
+    return {
+      title: "Collection Not Found | TK Media",
+      description: "The requested collection was not found.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const collectionName = collection.name || "Untitled Collection";
+  const collectionDescription =
+    collection.description ||
+    `Explore the ${collectionName} collection featuring curated photography by TK Media.`;
+
+  return {
+    title: `${collectionName} | TK Media Collections`,
+    description: collectionDescription,
+    keywords: [
+      "photo collection",
+      collectionName,
+      "TK Media",
+      "professional photography",
+      "Eastern Cape photographer",
+      "photography portfolio",
+      "curated photos",
+    ],
+    openGraph: {
+      title: `${collectionName} | TK Media Collections`,
+      description: collectionDescription,
+      type: "website",
+      images: [
+        {
+          url: "/logo.webp",
+          width: 799,
+          height: 604,
+          alt: `${collectionName} - TK Media Collection`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${collectionName} | TK Media`,
+      description: collectionDescription,
+      images: ["/logo.webp"],
+    },
+    alternates: {
+      canonical: `/collections/${slug}`,
+    },
+  };
 }
 
 export default async function PublicCollectionPage({

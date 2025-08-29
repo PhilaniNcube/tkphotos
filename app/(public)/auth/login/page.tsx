@@ -1,4 +1,23 @@
-import { LoginForm } from '@/components/login-form'
+import type { Metadata } from "next";
+import { LoginForm } from "@/components/login-form";
+
+export const metadata: Metadata = {
+  title: "Login | TK Media",
+  description:
+    "Login to access your private photo galleries and downloads from TK Media photography services.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+  openGraph: {
+    title: "Login | TK Media",
+    description: "Login to access your private photo galleries and downloads.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/auth/login",
+  },
+};
 
 export default function Page() {
   return (
@@ -7,5 +26,5 @@ export default function Page() {
         <LoginForm />
       </div>
     </div>
-  )
+  );
 }

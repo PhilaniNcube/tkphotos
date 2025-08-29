@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import { getGalleriesPaginated } from "@/lib/queries/galleries";
 import { PublicGalleriesGrid } from "./_components/public-galleries-grid";
 import {
@@ -10,6 +11,45 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+
+export const metadata: Metadata = {
+  title: "Photo Galleries | TK Media",
+  description:
+    "Browse our professional photography galleries featuring events, family portraits, sports, and corporate photography by Thandikaya Matokazi.",
+  keywords: [
+    "photo galleries",
+    "photography portfolio",
+    "event photography gallery",
+    "family portrait gallery",
+    "sports photography",
+    "Eastern Cape photographer",
+    "professional photos",
+  ],
+  openGraph: {
+    title: "Photo Galleries | TK Media",
+    description:
+      "Browse our professional photography galleries featuring events, family portraits, sports, and corporate photography.",
+    type: "website",
+    images: [
+      {
+        url: "/logo.webp",
+        width: 799,
+        height: 604,
+        alt: "TK Media Photography Galleries",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Photo Galleries | TK Media",
+    description:
+      "Browse our professional photography galleries featuring events, family portraits, sports, and corporate photography.",
+    images: ["/logo.webp"],
+  },
+  alternates: {
+    canonical: "/galleries",
+  },
+};
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
