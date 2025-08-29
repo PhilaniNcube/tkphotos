@@ -1,9 +1,8 @@
 import React from "react";
 import type { Metadata } from "next";
 import { getGalleriesPaginated } from "@/lib/queries/galleries";
-import { PublicGalleriesGrid } from "./_components/public-galleries-grid";
-import { GalleryPagination } from "./_components/gallery-pagination";
 import { GalleriesProvider } from "./_components/galleries-provider";
+import { GalleriesClient } from "./_components/galleries-client";
 
 export const metadata: Metadata = {
   title: "Photo Galleries | TK Media",
@@ -75,11 +74,11 @@ export default async function PublicGalleriesPage({ searchParams }: PageProps) {
             Browse a curated selection of public event galleries.
           </p>
         </header>
-        <PublicGalleriesGrid galleries={data} />
-        <GalleryPagination
-          currentPage={page}
-          pageCount={pageCount}
-          hasMore={hasMore}
+        <GalleriesClient
+          initialData={data}
+          initialPage={page}
+          initialPageCount={pageCount}
+          initialHasMore={hasMore}
         />
       </div>
     </GalleriesProvider>
