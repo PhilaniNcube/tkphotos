@@ -37,12 +37,12 @@ const NavLinks = () => {
             .from("galleries")
             .select("slug,title,is_public,created_at")
             .eq("is_public", true)
-            .order("title", { ascending: false })
+            .order("created_at", { ascending: false })
             .limit(15),
           supabase
             .from("collections")
             .select("slug,name,created_at")
-            .order("name", { ascending: false })
+            .order("created_at", { ascending: false })
             .limit(15),
         ]);
         if (gals.error) throw gals.error;

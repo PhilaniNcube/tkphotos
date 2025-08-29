@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const HomepageGalleriesGrid = async () => {
   const galleries = await getHomepageGalleries({
-    limit: 3,
+    galleryIds: [26, 18, 13],
     photosPerGallery: 1,
   });
   return (

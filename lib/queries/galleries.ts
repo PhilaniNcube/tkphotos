@@ -212,33 +212,70 @@ export async function getGalleryBySlug(
   return data;
 }
 
-// Lightweight homepage galleries fetch: returns up to `limit` public galleries,
-// newest first, plus up to `photosPerGallery` recent photos (for cover display / counts).
+// Fetch specific galleries for homepage display
+// Returns specific galleries by IDs or slugs, plus up to `photosPerGallery` recent photos
 export async function getHomepageGalleries(
   options: {
-    limit?: number;
+    galleryIds?: number[];
+    gallerySlugs?: string[];
     photosPerGallery?: number;
+    fallbackToRecent?: boolean; // if true, fall back to recent galleries if specific ones not found
   } = {}
 ) {
   const supabase = await createClient();
-  const limit = Math.min(Math.max(options.limit ?? 3, 1), 12);
   const photosPerGallery = Math.min(
     Math.max(options.photosPerGallery ?? 1, 0),
     8
   );
 
-  const { data: galleries, error } = await supabase
-    .from("galleries")
-    .select("*")
-    .eq("is_public", true)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error || !galleries?.length) return [] as GalleryWithPhotos[];
+  let galleries: GalleryRow[] = [];
+
+  // First try to get specific galleries by IDs
+  if (options.galleryIds?.length) {
+    const { data: galleriesByIds, error } = await supabase
+      .from("galleries")
+      .select("*")
+      .in("id", options.galleryIds)
+      .eq("is_public", true);
+
+    if (!error && galleriesByIds) {
+      galleries = galleriesByIds;
+    }
+  }
+
+  // If no galleries found by IDs, try by slugs
+  if (galleries.length === 0 && options.gallerySlugs?.length) {
+    const { data: galleriesBySlugs, error } = await supabase
+      .from("galleries")
+      .select("*")
+      .in("slug", options.gallerySlugs)
+      .eq("is_public", true);
+
+    if (!error && galleriesBySlugs) {
+      galleries = galleriesBySlugs;
+    }
+  }
+
+  // Fallback to recent galleries if no specific ones found and fallback is enabled
+  if (galleries.length === 0 && options.fallbackToRecent) {
+    const { data: recentGalleries, error } = await supabase
+      .from("galleries")
+      .select("*")
+      .eq("is_public", true)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (!error && recentGalleries) {
+      galleries = recentGalleries;
+    }
+  }
+
+  if (!galleries.length) return [] as GalleryWithPhotos[];
 
   if (photosPerGallery === 0)
     return galleries.map((g) => ({ ...g, photos: [] }));
 
-  // Fetch photos for each gallery (could be optimized with RPC or a single IN query)
+  // Fetch photos for each gallery
   const results: GalleryWithPhotos[] = [];
   for (const g of galleries) {
     const { data: photos } = await supabase
