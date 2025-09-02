@@ -66,7 +66,7 @@ export default function AboutPage() {
               About Thandikaya Matokazi
             </h1>
             <p className="text-base md:text-lg text-stone-600 leading-relaxed">
-              I'm a photographer based in the Eastern Cape with over six years
+              I'm a photographer based in the Eastern Cape with over nine years
               of professional experience—shaped by a visual storytelling
               approach and a foundation in media studies from the University of
               Fort Hare. My work spans community events, family milestones,
