@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { connection } from "next/server";
 import {
   getAllCollections,
   type CollectionRow,
@@ -9,6 +10,8 @@ import {
 } from "@/lib/queries/galleries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await connection();
+
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tkmedia.co.za";
 
   // Get dynamic routes data

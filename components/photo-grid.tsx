@@ -78,7 +78,6 @@ function PhotoTile({ photo }: { photo: PhotoGridItem }) {
           sizes="(max-width:768px) 50vw, (max-width:1024px) 33vw, 20vw"
           className="object-cover transition-transform duration-300 group-hover:scale-[1.02] h-full w-full"
           placeholder="empty"
-          quality={70}
           unoptimized
         />
       </div>

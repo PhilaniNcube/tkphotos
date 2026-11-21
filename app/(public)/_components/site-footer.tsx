@@ -1,15 +1,20 @@
 import * as React from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { Facebook, Instagram } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
+import { CurrentYear } from "./current-year";
 
 export function SiteFooter() {
   return (
     <footer className="w-full border-t border-outline-variant/50 bg-surface-container-low py-10 pb-24 md:pb-10 text-sm text-on-surface-variant">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 lg:px-12 md:flex-row">
         <p className="text-center md:text-left">
-          &copy; {new Date().getFullYear()} TK Media / TK Photography. All rights
-          reserved.
+          &copy;{" "}
+          <Suspense fallback={null}>
+            <CurrentYear />
+          </Suspense>{" "}
+          TK Media / TK Photography. All rights reserved.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-6">

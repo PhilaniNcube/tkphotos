@@ -9,6 +9,11 @@ import React from "react";
 import { importMap } from "./admin/importMap.js";
 import "./custom.scss";
 
+// The Payload admin is a request-time application with its own auth and session
+// handling, so it is allowed to block navigation and is never prefetched.
+export const instant = false;
+export const prefetch = "force-disabled";
+
 type Args = {
   children: React.ReactNode;
 };

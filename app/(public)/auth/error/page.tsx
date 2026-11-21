@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -19,13 +20,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Page({
-  searchParams,
-}: {
+type AuthErrorPageProps = {
   searchParams: Promise<{ error: string }>;
-}) {
+};
+
+export default function Page({ searchParams }: AuthErrorPageProps) {
+  return (
+    <Suspense fallback={<AuthErrorCard />}>
+      <AuthErrorContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function AuthErrorContent({ searchParams }: AuthErrorPageProps) {
   const params = await searchParams;
 
+  return <AuthErrorCard error={params?.error} />;
+}
+
+function AuthErrorCard({ error }: { error?: string }) {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
@@ -37,9 +50,9 @@ export default async function Page({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {params?.error ? (
+              {error ? (
                 <p className="text-sm text-muted-foreground">
-                  Code error: {params.error}
+                  Code error: {error}
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">

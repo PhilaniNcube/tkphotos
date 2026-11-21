@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import type { Where } from "payload";
 
 import type { Gallery, Media, PhotoCollection } from "@/payload-types";
@@ -144,6 +145,9 @@ async function enrichGalleriesMeta(
 export async function getGalleriesPaginated(
   opts: GetGalleriesOptions = {}
 ): Promise<PaginatedResult<GalleryRow>> {
+  "use cache";
+  cacheLife("minutes");
+
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.min(Math.max(opts.pageSize ?? 20, 1), 100);
 
@@ -219,6 +223,9 @@ export async function getGalleriesPaginated(
 }
 
 export async function getGalleryById(id: number): Promise<GalleryRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const doc = await payload.findByID({
@@ -238,6 +245,9 @@ export async function getGalleryBySlug(
   slug: string,
   opts: { includeMeta?: boolean } = {}
 ): Promise<GalleryRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -267,6 +277,9 @@ export async function getGalleryWithPhotos(
   id: number,
   opts: { limit?: number } = {}
 ): Promise<GalleryWithPhotos | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const base = await getGalleryById(id);
     if (!base) return null;
@@ -301,6 +314,9 @@ export async function getHomepageGalleries(
     fallbackToRecent?: boolean;
   } = {}
 ): Promise<GalleryWithPhotos[]> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const photosPerGallery = Math.min(

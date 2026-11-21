@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import type { Where } from "payload";
 
 import type { Gallery, Media } from "@/payload-types";
@@ -44,6 +45,9 @@ function buildWhere(opts: GetPhotosOptions): Where {
 export async function getPhotosPaginated(
   opts: GetPhotosOptions = {}
 ): Promise<PaginatedResult<PhotoRow>> {
+  "use cache";
+  cacheLife("minutes");
+
   const payload = await getPayloadClient();
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.min(Math.max(opts.pageSize ?? 40, 1), 200);
@@ -86,6 +90,9 @@ export async function getPhotosPaginated(
 }
 
 export async function getPhotoById(id: string): Promise<PhotoRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   const payload = await getPayloadClient();
 
   try {
@@ -121,6 +128,9 @@ function isFromPublicGallery(media: Media): boolean {
 }
 
 export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
+  "use cache";
+  cacheLife("minutes");
+
   const target = Math.min(Math.max(limit, 1), 50);
   try {
     const payload = await getPayloadClient();
@@ -175,6 +185,9 @@ export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
 export async function getPhotoByLegacyUrl(
   url: string
 ): Promise<PhotoRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -195,6 +208,9 @@ export async function getPhotoByLegacyUrl(
 export async function getPhotosByLegacyUrls(
   urls: string[]
 ): Promise<PhotoRow[]> {
+  "use cache";
+  cacheLife("minutes");
+
   if (!urls.length) return [];
   try {
     const payload = await getPayloadClient();
@@ -222,6 +238,9 @@ export async function getRecentPhotosForGalleries(
   galleryIds: number[],
   opts: { perGallery?: number } = {}
 ): Promise<Record<number, PhotoRow[]>> {
+  "use cache";
+  cacheLife("minutes");
+
   if (!galleryIds.length) return {};
 
   try {

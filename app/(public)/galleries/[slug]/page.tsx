@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -79,7 +80,15 @@ export async function generateMetadata({
   };
 }
 
-export default async function PublicGalleryPage({ params }: GalleryPageProps) {
+export default function PublicGalleryPage({ params }: GalleryPageProps) {
+  return (
+    <Suspense fallback={<GalleryPageFallback />}>
+      <GalleryDetails params={params} />
+    </Suspense>
+  );
+}
+
+async function GalleryDetails({ params }: GalleryPageProps) {
   const { slug } = await params;
   const galleryMeta = await getGalleryBySlug(slug);
 
@@ -121,4 +130,23 @@ export default async function PublicGalleryPage({ params }: GalleryPageProps) {
   }
 
   return <GalleryDetailView gallery={gallery} />;
+}
+
+function GalleryPageFallback() {
+  return (
+    <div className="mx-auto w-full max-w-7xl px-6 py-12 lg:px-12">
+      <div className="mb-8 space-y-3">
+        <div className="h-9 w-2/3 animate-pulse rounded-lg bg-surface-container" />
+        <div className="h-4 w-1/2 animate-pulse rounded bg-surface-container" />
+      </div>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div
+            key={index}
+            className="aspect-square animate-pulse rounded-xl bg-surface-container"
+          />
+        ))}
+      </div>
+    </div>
+  );
 }

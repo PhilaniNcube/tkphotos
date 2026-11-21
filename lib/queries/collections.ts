@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import type { Where } from "payload";
 
 import type { Gallery, Media, PhotoCollection } from "@/payload-types";
@@ -25,6 +26,9 @@ export interface GetCollectionsOptions {
 export async function getCollectionsPaginated(
   opts: GetCollectionsOptions = {}
 ): Promise<PaginatedResult<CollectionRow>> {
+  "use cache";
+  cacheLife("minutes");
+
   const page = Math.max(1, opts.page ?? 1);
   const pageSize = Math.min(Math.max(opts.pageSize ?? 20, 1), 100);
   const direction = opts.ascending ? "" : "-";
@@ -94,6 +98,9 @@ export async function getAllCollections(
     limit?: number;
   } = {}
 ): Promise<{ data: CollectionRow[]; error?: string }> {
+  "use cache";
+  cacheLife("minutes");
+
   const direction = opts.ascending ? "" : "-";
   const sort =
     opts.orderBy === "name" ? `${direction}name` : `${direction}createdAt`;
@@ -128,6 +135,9 @@ export async function getCollectionsShowcase(): Promise<{
   data: CollectionShowcaseRow[];
   error?: string;
 }> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const collectionsRes = await payload.find({
@@ -230,6 +240,9 @@ export async function getCollectionsShowcase(): Promise<{
 export async function getCollectionById(
   id: string
 ): Promise<CollectionRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const doc = await payload.findByID({
@@ -247,6 +260,9 @@ export async function getCollectionById(
 export async function getCollectionBySlug(
   slug: string
 ): Promise<CollectionRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({
@@ -304,6 +320,9 @@ function mapGalleries(
 export async function getCollectionWithGalleries(
   id: number
 ): Promise<CollectionWithGalleries | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const doc = (await payload.findByID({
@@ -326,6 +345,9 @@ export async function getCollectionWithGalleries(
 export async function getCollectionGalleries(
   collectionSlug: string
 ): Promise<CollectionWithGalleries | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const result = await payload.find({

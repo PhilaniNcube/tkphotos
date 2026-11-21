@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getAllCollections } from "@/lib/queries/collections";
 import { getGalleriesPaginated } from "@/lib/queries/galleries";
@@ -48,7 +49,15 @@ interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function PublicGalleriesPage({ searchParams }: PageProps) {
+export default function PublicGalleriesPage({ searchParams }: PageProps) {
+  return (
+    <Suspense fallback={<GalleriesPageFallback />}>
+      <GalleriesPageContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function GalleriesPageContent({ searchParams }: PageProps) {
   const resolved = await searchParams;
   const pageParam = Array.isArray(resolved.page)
     ? resolved.page[0]
@@ -84,5 +93,21 @@ export default async function PublicGalleriesPage({ searchParams }: PageProps) {
         collections={collectionsResult.data}
       />
     </GalleriesProvider>
+  );
+}
+
+function GalleriesPageFallback() {
+  return (
+    <div className="mx-auto w-full max-w-7xl px-6 py-12 lg:px-12">
+      <div className="mb-8 h-9 w-52 animate-pulse rounded-lg bg-surface-container" />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div
+            key={index}
+            className="aspect-[4/3] animate-pulse rounded-2xl bg-surface-container"
+          />
+        ))}
+      </div>
+    </div>
   );
 }

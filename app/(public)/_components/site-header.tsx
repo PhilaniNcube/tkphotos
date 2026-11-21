@@ -1,54 +1,86 @@
 import * as React from "react";
-import Link from "next/link";
-import Image from "next/image";
-import type { CollectionRow, GalleryRow } from "@/lib/media";
+import { Suspense } from "react";
+
+import { getAllCollections } from "@/lib/queries/collections";
+import { getGalleriesPaginated } from "@/lib/queries/galleries";
+import { getCurrentUser } from "@/lib/queries/user";
 import { DesktopNavMenu } from "./desktop-nav-menu";
 import { MobileNavDrawer } from "./mobile-nav-drawer";
-import { UserMenu, type SupabaseUserLike } from "./user-menu";
+import { SiteHeaderShell } from "./site-header-shell";
 
-interface SiteHeaderProps {
-  userData: SupabaseUserLike | null;
-  navGalleries: GalleryRow[];
-  navCollections: CollectionRow[];
+export function SiteHeader() {
+  return (
+    <SiteHeaderShell
+      mobileNav={
+        <Suspense fallback={<MobileNavFallback />}>
+          <MobileNav />
+        </Suspense>
+      }
+      desktopNav={
+        <Suspense fallback={<DesktopNavFallback />}>
+          <DesktopNav />
+        </Suspense>
+      }
+    />
+  );
 }
 
-export function SiteHeader({
-  userData,
-  navGalleries,
-  navCollections,
-}: SiteHeaderProps) {
+async function MobileNav() {
+  const [collectionsResult, userData] = await Promise.all([
+    getAllCollections({
+      orderBy: "created_at",
+      ascending: false,
+      limit: 8,
+    }),
+    getCurrentUser(),
+  ]);
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-outline-variant/60 bg-surface/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-12">
-        <div className="flex items-center gap-2.5 shrink-0">
-          <MobileNavDrawer
-            collections={navCollections}
-            isSignedIn={Boolean(userData)}
-          />
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image
-              src="/logo.webp"
-              alt="TK Media Logo"
-              width={799}
-              height={604}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-            <span className="text-base sm:text-lg font-bold tracking-tight text-on-surface">
-              TK Photography
-            </span>
-          </Link>
-        </div>
+    <MobileNavDrawer
+      collections={collectionsResult.data}
+      isSignedIn={Boolean(userData)}
+    />
+  );
+}
 
-        <div className="hidden md:block">
-          <DesktopNavMenu
-            galleries={navGalleries}
-            collections={navCollections}
-          />
-        </div>
+async function DesktopNav() {
+  const [galleriesResult, collectionsResult] = await Promise.all([
+    getGalleriesPaginated({
+      page: 1,
+      pageSize: 6,
+      publicOnly: true,
+      orderBy: "created_at",
+      ascending: false,
+    }),
+    getAllCollections({
+      orderBy: "created_at",
+      ascending: false,
+      limit: 8,
+    }),
+  ]);
 
-        <UserMenu userData={userData} />
-      </div>
-    </header>
+  return (
+    <DesktopNavMenu
+      galleries={galleriesResult.data}
+      collections={collectionsResult.data}
+    />
+  );
+}
+
+function MobileNavFallback() {
+  return (
+    <div
+      aria-hidden="true"
+      className="h-10 w-10 animate-pulse rounded-full bg-surface-container md:hidden"
+    />
+  );
+}
+
+function DesktopNavFallback() {
+  return (
+    <div
+      aria-hidden="true"
+      className="h-9 w-[26rem] max-w-[40vw] animate-pulse rounded-lg bg-surface-container"
+    />
   );
 }

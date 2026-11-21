@@ -4,9 +4,11 @@ import type { NextConfig } from "next";
 const r2PublicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  partialPrefetching: true,
   typedRoutes: true,
   images: {
-    qualities: [50, 70, 80, 85, 90],
+    qualities: [75],
     remotePatterns: [
       // Cloudflare R2 public bucket (migrated media + all new uploads)
       ...(r2PublicUrl

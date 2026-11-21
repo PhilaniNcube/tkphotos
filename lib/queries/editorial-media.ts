@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import type { Gallery, Media } from "@/payload-types";
 
 import { toPhotoRow, type PhotoRow } from "../media";
@@ -20,6 +21,9 @@ export const ABOUT_PORTRAIT_LEGACY_URL =
   "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvZFXisQnCMRxelq86Yd95OruyTwQtaIKSNHzB";
 
 async function resolveGalleryCoverPhoto(slug: string): Promise<PhotoRow | null> {
+  "use cache";
+  cacheLife("minutes");
+
   try {
     const payload = await getPayloadClient();
     const res = await payload.find({

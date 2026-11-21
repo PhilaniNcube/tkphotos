@@ -6,9 +6,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 
 import { AnalyticsProvider } from "@/components/analytics-provider";
 import { AppToaster } from "@/components/ui-sdk/app-toaster";
-import { getAllCollections } from "@/lib/queries/collections";
-import { getGalleriesPaginated } from "@/lib/queries/galleries";
-import { getCurrentUser } from "@/lib/queries/user";
 import { MobileBottomNav } from "./_components/mobile-bottom-nav";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
@@ -105,27 +102,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function PublicLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [userData, galleriesResult, collectionsResult] = await Promise.all([
-    getCurrentUser(),
-    getGalleriesPaginated({
-      page: 1,
-      pageSize: 6,
-      publicOnly: true,
-      orderBy: "created_at",
-      ascending: false,
-    }),
-    getAllCollections({
-      orderBy: "created_at",
-      ascending: false,
-      limit: 8,
-    }),
-  ]);
-
   return (
     <html
       lang="en"
@@ -140,16 +121,14 @@ export default async function PublicLayout({
             >
               Skip to content
             </Link>
-            <SiteHeader
-              userData={userData}
-              navGalleries={galleriesResult.data}
-              navCollections={collectionsResult.data}
-            />
+            <SiteHeader />
             <main id="main" className="flex-1">
               {children}
             </main>
             <SiteFooter />
-            <MobileBottomNav />
+            <React.Suspense fallback={null}>
+              <MobileBottomNav />
+            </React.Suspense>
             <AppToaster />
           </div>
         </AnalyticsProvider>

@@ -6,6 +6,10 @@ import { LogoutButton } from "@/components/logout-button";
 import { createClient } from "@/lib/server";
 import { getAdmin } from "@/lib/queries/user";
 
+// The auth gate reads the session and redirects before any UI can render, so
+// this segment is allowed to block navigation.
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Protected Area | TK Media",
   description:

@@ -98,7 +98,9 @@ import { AppToaster } from "@/components/ui-sdk/app-toaster";
 import type { CollectionRow, GalleryRow, PhotoRow } from "@/lib/media";
 import type { CollectionShowcaseRow } from "@/lib/queries/collections";
 import type { GalleryWithPhotos } from "@/lib/queries/galleries";
-import { SiteHeader } from "@/app/(public)/_components/site-header";
+import { SiteHeaderShell } from "@/app/(public)/_components/site-header-shell";
+import { DesktopNavMenu } from "@/app/(public)/_components/desktop-nav-menu";
+import { MobileNavDrawer } from "@/app/(public)/_components/mobile-nav-drawer";
 import { PackagesPricingSection } from "@/app/(public)/services/_components/packages-pricing-section";
 import { GalleriesHeaderSection } from "@/app/(public)/galleries/_components/galleries-header-section";
 import { GalleriesPaginationSection } from "@/app/(public)/galleries/_components/galleries-pagination-section";
@@ -374,11 +376,22 @@ describe("SiteHeader navigation", () => {
     const user = userEvent.setup();
     mockPathname = "/services";
 
+    const navCollections = [makeCollection(1, "Nature", "nature")];
+
     render(
-      <SiteHeader
-        userData={null}
-        navGalleries={sampleGalleries}
-        navCollections={[makeCollection(1, "Nature", "nature")]}
+      <SiteHeaderShell
+        desktopNav={
+          <DesktopNavMenu
+            galleries={sampleGalleries}
+            collections={navCollections}
+          />
+        }
+        mobileNav={
+          <MobileNavDrawer
+            collections={navCollections}
+            isSignedIn={false}
+          />
+        }
       />
     );
 
