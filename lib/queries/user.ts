@@ -1,19 +1,21 @@
 import { createClient } from "../server";
 
 export async function getCurrentUser() {
-  const supabase = await createClient();
-
-  const { data } = await supabase.auth.getClaims();
-
-  if (!data) return null;
-
-  return data.claims;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    return data?.claims ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getAdmin() {
-  const supabase = await createClient();
-
-  const { data } = await supabase.rpc("is_admin");
-
-  return data;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.rpc("is_admin");
+    return data;
+  } catch {
+    return false;
+  }
 }

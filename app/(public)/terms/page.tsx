@@ -46,18 +46,18 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="py-14 md:py-20">
+    <div className="bg-surface py-14 text-on-surface md:py-20">
       <div className="mx-auto w-full container px-4 max-w-4xl">
         <div className="space-y-12">
           {/* Header */}
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-stone-800">
+            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-on-surface">
               Terms of Service
             </h1>
-            <p className="text-base md:text-lg text-stone-600 leading-relaxed">
+            <p className="text-base md:text-lg text-on-surface-variant leading-relaxed">
               Last updated: August 23, 2025
             </p>
-            <p className="text-sm md:text-base text-stone-600 leading-relaxed">
+            <p className="text-sm md:text-base text-on-surface-variant leading-relaxed">
               These terms govern your use of TK Media photography services and
               this website. By using our services, you agree to these terms.
             </p>
@@ -67,10 +67,10 @@ export default function TermsPage() {
           <div className="space-y-10">
             {/* 1. Services */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 1. Photography Services
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   TK Media provides professional photography services including
                   but not limited to: events, portraits, corporate photography,
@@ -87,10 +87,10 @@ export default function TermsPage() {
 
             {/* 2. Client Galleries */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 2. Client Galleries & Access
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Client galleries are private and accessible only with valid
                   login credentials provided by TK Media. Gallery access is
@@ -113,10 +113,10 @@ export default function TermsPage() {
 
             {/* 3. Image Rights & Usage */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 3. Image Rights & Usage
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   TK Media retains copyright ownership of all photographs unless
                   explicitly transferred in writing. Clients receive usage
@@ -141,10 +141,10 @@ export default function TermsPage() {
 
             {/* 4. Downloads & Delivery */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 4. Downloads & Delivery
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Final edited images are delivered through secure client
                   galleries within the timeframe specified in your service
@@ -167,10 +167,10 @@ export default function TermsPage() {
 
             {/* 5. Payment & Cancellation */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 5. Payment & Cancellation
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Payment terms are specified in individual service agreements.
                   Deposits are typically required to secure booking dates and
@@ -192,10 +192,10 @@ export default function TermsPage() {
 
             {/* 6. Website Use */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 6. Website Use & Conduct
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   This website is provided for informational purposes and client
                   gallery access. Users must not attempt to access unauthorized
@@ -216,10 +216,10 @@ export default function TermsPage() {
 
             {/* 7. Liability & Disclaimers */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 7. Liability & Disclaimers
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   TK Media's liability is limited to the total amount paid for
                   services. We are not liable for indirect, consequential, or
@@ -242,15 +242,15 @@ export default function TermsPage() {
 
             {/* 8. Privacy */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 8. Privacy & Data Protection
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Client information and images are handled according to our{" "}
                   <Link
                     href="/privacy"
-                    className="text-stone-800 hover:text-stone-600 underline underline-offset-2"
+                    className="text-primary hover:text-primary-container underline underline-offset-2"
                   >
                     Privacy Policy
                   </Link>
@@ -268,10 +268,10 @@ export default function TermsPage() {
 
             {/* 9. Changes to Terms */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 9. Changes to Terms
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   These terms may be updated periodically. Continued use of our
                   services or website after changes constitutes acceptance of
@@ -287,10 +287,10 @@ export default function TermsPage() {
 
             {/* 10. Contact */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 10. Contact Information
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   For questions about these terms or our services, please
                   contact us:
@@ -302,7 +302,7 @@ export default function TermsPage() {
                     Website:{" "}
                     <Link
                       href="/contact"
-                      className="text-stone-800 hover:text-stone-600 underline underline-offset-2"
+                      className="text-primary hover:text-primary-container underline underline-offset-2"
                     >
                       Contact Form
                     </Link>
@@ -313,14 +313,14 @@ export default function TermsPage() {
           </div>
 
           {/* Footer */}
-          <div className="pt-8 border-t border-stone-200">
-            <p className="text-sm text-stone-500">
+          <div className="pt-8 border-t border-outline-variant">
+            <p className="text-sm text-on-surface-variant">
               By using TK Media services, you acknowledge that you have read,
               understood, and agree to be bound by these Terms of Service.
             </p>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

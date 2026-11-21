@@ -46,18 +46,18 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <main className="py-14 md:py-20">
+    <div className="bg-surface py-14 text-on-surface md:py-20">
       <div className="mx-auto w-full container px-4 max-w-4xl">
         <div className="space-y-12">
           {/* Header */}
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-stone-800">
+            <h1 className="text-4xl md:text-5xl font-light tracking-tight text-on-surface">
               Privacy Policy
             </h1>
-            <p className="text-base md:text-lg text-stone-600 leading-relaxed">
+            <p className="text-base md:text-lg text-on-surface-variant leading-relaxed">
               Last updated: August 23, 2025
             </p>
-            <p className="text-sm md:text-base text-stone-600 leading-relaxed">
+            <p className="text-sm md:text-base text-on-surface-variant leading-relaxed">
               This privacy policy explains how TK Media collects, uses, and
               protects your personal information when you use our photography
               services and website.
@@ -68,11 +68,11 @@ export default function PrivacyPage() {
           <div className="space-y-10">
             {/* 1. Information We Collect */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 1. Information We Collect
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
-                <h3 className="text-lg font-semibold text-stone-800">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
+                <h3 className="text-lg font-semibold text-on-surface">
                   Personal Information
                 </h3>
                 <p>When you contact us or book our services, we may collect:</p>
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
                   <li>Any other information you choose to provide</li>
                 </ul>
 
-                <h3 className="text-lg font-semibold text-stone-800 pt-4">
+                <h3 className="text-lg font-semibold text-on-surface pt-4">
                   Photographs and Images
                 </h3>
                 <p>As a photography service, we collect and process:</p>
@@ -95,7 +95,7 @@ export default function PrivacyPage() {
                   <li>Client selections and favorites</li>
                 </ul>
 
-                <h3 className="text-lg font-semibold text-stone-800 pt-4">
+                <h3 className="text-lg font-semibold text-on-surface pt-4">
                   Website Usage Information
                 </h3>
                 <p>When you visit our website, we automatically collect:</p>
@@ -110,10 +110,10 @@ export default function PrivacyPage() {
 
             {/* 2. How We Use Information */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 2. How We Use Your Information
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>We use your information to:</p>
                 <ul className="pl-6 space-y-2 list-disc">
                   <li>Provide photography services and deliver your images</li>
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
                   <li>Comply with legal obligations and protect our rights</li>
                 </ul>
 
-                <h3 className="text-lg font-semibold text-stone-800 pt-4">
+                <h3 className="text-lg font-semibold text-on-surface pt-4">
                   Portfolio and Marketing Use
                 </h3>
                 <p>
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
                   <li>Professional awards and competition submissions</li>
                   <li>Educational purposes and industry publications</li>
                 </ul>
-                <p className="text-sm italic text-stone-600">
+                <p className="text-sm italic text-on-surface-variant">
                   You can opt out of portfolio use at any time by contacting us.
                 </p>
               </div>
@@ -149,10 +149,10 @@ export default function PrivacyPage() {
 
             {/* 3. Information Sharing */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 3. How We Share Your Information
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   We do not sell, rent, or trade your personal information. We
                   may share information only in the following circumstances:
@@ -185,10 +185,10 @@ export default function PrivacyPage() {
 
             {/* 4. Data Security */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 4. Data Security
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   We implement reasonable security measures to protect your
                   information:
@@ -213,10 +213,10 @@ export default function PrivacyPage() {
 
             {/* 5. Data Retention */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 5. Data Retention
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   We retain your information for different periods based on type
                   and purpose:
@@ -250,10 +250,10 @@ export default function PrivacyPage() {
 
             {/* 6. Your Rights */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 6. Your Privacy Rights
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>You have the right to:</p>
                 <ul className="pl-6 space-y-2 list-disc">
                   <li>Access and review your personal information</li>
@@ -274,10 +274,10 @@ export default function PrivacyPage() {
 
             {/* 7. Cookies and Tracking */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 7. Cookies and Website Tracking
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>Our website uses cookies and similar technologies to:</p>
                 <ul className="pl-6 space-y-2 list-disc">
                   <li>Remember your login status for client galleries</li>
@@ -295,10 +295,10 @@ export default function PrivacyPage() {
 
             {/* 8. Third-Party Services */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 8. Third-Party Services
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Our website and services may integrate with third-party
                   platforms:
@@ -319,10 +319,10 @@ export default function PrivacyPage() {
 
             {/* 9. Children's Privacy */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 9. Children's Privacy
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   Our services are not directed to children under 13. We do not
                   knowingly collect personal information from children under 13
@@ -343,10 +343,10 @@ export default function PrivacyPage() {
 
             {/* 10. International Users */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 10. International Data Transfers
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   TK Media is based in South Africa. If you are accessing our
                   services from other countries, your information may be
@@ -363,10 +363,10 @@ export default function PrivacyPage() {
 
             {/* 11. Policy Updates */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 11. Policy Updates
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   We may update this privacy policy periodically to reflect
                   changes in our practices or legal requirements. We will notify
@@ -389,10 +389,10 @@ export default function PrivacyPage() {
 
             {/* 12. Contact Information */}
             <section className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-stone-800">
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-on-surface">
                 12. Contact Us
               </h2>
-              <div className="space-y-4 text-sm md:text-base text-stone-700 leading-relaxed">
+              <div className="space-y-4 text-sm md:text-base text-on-surface-variant leading-relaxed">
                 <p>
                   If you have questions about this privacy policy or how we
                   handle your information, please contact us:
@@ -407,7 +407,7 @@ export default function PrivacyPage() {
                     Website:{" "}
                     <Link
                       href="/contact"
-                      className="text-stone-800 hover:text-stone-600 underline underline-offset-2"
+                      className="text-primary hover:text-primary-container underline underline-offset-2"
                     >
                       Contact Form
                     </Link>
@@ -422,8 +422,8 @@ export default function PrivacyPage() {
           </div>
 
           {/* Footer */}
-          <div className="pt-8 border-t border-stone-200">
-            <p className="text-sm text-stone-500">
+          <div className="pt-8 border-t border-outline-variant">
+            <p className="text-sm text-on-surface-variant">
               By using TK Media services and website, you acknowledge that you
               have read and understood this Privacy Policy and agree to the
               collection and use of your information as described herein.
@@ -431,6 +431,6 @@ export default function PrivacyPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

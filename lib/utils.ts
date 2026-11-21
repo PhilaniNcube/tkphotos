@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-// Supabase storage no longer used for photos; helper functions simplified.
+
+import type { MediaSizeName } from "./media";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,12 +19,41 @@ export function generateAccessKey(length = 12): string {
   return result;
 }
 
-// Build a public URL for a photo stored in the Supabase "photos" bucket.
-// storageKey is the path saved in the photos.storage_key column (path after the bucket name).
-// Example: storageKey = "weddings/IMG_1234.jpg" =>
-//   https://<project>.supabase.co/storage/v1/object/public/photos/weddings/IMG_1234.jpg
-// If storageKey is empty or env vars missing, returns "".
-export function photoSrc(storageKey: string | null | undefined): string {
-  // Now storage_key already stores the full public URL (e.g. UploadThing ufsUrl)
-  return storageKey ? String(storageKey) : "";
+/**
+ * Resolve a photo source for a given display size.
+ *
+ * Accepts either a legacy string URL (kept for compatibility with static
+ * assets) or a photo object returned by the Payload query layer, where the
+ * pre-generated R2 variants live under `sizes`.
+ */
+export function photoSrc(
+  photo:
+    | string
+    | null
+    | undefined
+    | {
+        url?: string | null;
+        storage_key?: string | null;
+        sizes?: Partial<
+          Record<MediaSizeName, { url?: string | null } | undefined | null>
+        >;
+      },
+  size: MediaSizeName = "medium"
+): string {
+  if (!photo) return "";
+  if (typeof photo === "string") return photo;
+
+  const order: MediaSizeName[] =
+    size === "thumbnail"
+      ? ["thumbnail", "medium", "full"]
+      : size === "medium"
+      ? ["medium", "full", "thumbnail"]
+      : ["full", "medium", "thumbnail"];
+
+  for (const name of order) {
+    const url = photo.sizes?.[name]?.url;
+    if (url) return url;
+  }
+
+  return photo.url || photo.storage_key || "";
 }

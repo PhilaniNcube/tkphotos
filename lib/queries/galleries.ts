@@ -1,70 +1,211 @@
-import { createClient } from "../server";
-import type { Tables } from "../types";
+import type { Where } from "payload";
+
+import type { Gallery, Media, PhotoCollection } from "@/payload-types";
+
+import {
+  mediaSizes,
+  mediaUrl,
+  toGalleryRow,
+  toPhotoRow,
+  type GalleryRow,
+  type PhotoRow,
+} from "../media";
+import { getPayloadClient } from "../payload";
+
+export type { GalleryRow } from "../media";
 
 export interface GetGalleriesOptions {
-  page?: number; // 1-based
-  pageSize?: number; // default 20
-  search?: string; // matches title or description (ILIKE)
-  publicOnly?: boolean; // filter is_public = true
-  orderBy?: "created_at" | "event_date" | "title"; // default created_at
-  ascending?: boolean; // default false (newest first)
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  publicOnly?: boolean;
+  collectionSlug?: string;
+  includeMeta?: boolean;
+  orderBy?: "created_at" | "event_date" | "title";
+  ascending?: boolean;
 }
 
 export interface PaginatedResult<T> {
   data: T[];
   page: number;
   pageSize: number;
-  total: number; // total matching rows (may be 0)
-  pageCount: number; // total pages (>= 0)
-  hasMore: boolean; // true if another page exists after this one
-  error?: string; // populated if request failed
+  total: number;
+  pageCount: number;
+  hasMore: boolean;
+  error?: string;
 }
 
-export type GalleryRow = Tables<"galleries">;
+function sortFor(opts: GetGalleriesOptions): string {
+  const direction = opts.ascending ? "" : "-";
+  switch (opts.orderBy) {
+    case "title":
+      return `${direction}title`;
+    case "event_date":
+      return `${direction}eventDate`;
+    default:
+      return `${direction}createdAt`;
+  }
+}
 
-/**
- * Fetch galleries with simple offset pagination.
- * Uses PostgREST range() and an exact count so we can compute total pages.
- * Intended for small/medium result sets (page * pageSize not extremely large).
- * For large datasets consider cursor-based pagination on created_at or id.
- */
+async function resolveCollectionGalleryIds(
+  collectionSlug: string
+): Promise<number[] | null> {
+  const payload = await getPayloadClient();
+  const res = await payload.find({
+    collection: "photo-collections",
+    where: { slug: { equals: collectionSlug } },
+    limit: 1,
+    depth: 0,
+    overrideAccess: true,
+  });
+  const collection = res.docs[0] as PhotoCollection | undefined;
+  if (!collection) return [];
+  return (collection.galleries ?? [])
+    .map((item) => (typeof item === "number" ? item : item?.id))
+    .filter((id): id is number => typeof id === "number");
+}
+
+async function enrichGalleriesMeta(
+  galleries: GalleryRow[]
+): Promise<GalleryRow[]> {
+  if (!galleries.length) return galleries;
+
+  const payload = await getPayloadClient();
+  const galleryIds = galleries.map((g) => g.id);
+
+  const [collectionsRes, mediaRes] = await Promise.all([
+    payload.find({
+      collection: "photo-collections",
+      limit: 200,
+      depth: 0,
+      overrideAccess: true,
+    }),
+    payload.find({
+      collection: "media",
+      where: { gallery: { in: galleryIds } },
+      sort: "-createdAt",
+      limit: 2000,
+      depth: 0,
+      overrideAccess: true,
+    }),
+  ]);
+
+  const collectionsByGallery = new Map<
+    number,
+    Array<{ id: number; name: string; slug: string }>
+  >();
+  for (const col of collectionsRes.docs as PhotoCollection[]) {
+    for (const ref of col.galleries ?? []) {
+      const gid = typeof ref === "number" ? ref : ref?.id;
+      if (!gid) continue;
+      const list = collectionsByGallery.get(gid) ?? [];
+      list.push({ id: col.id, name: col.name, slug: col.slug });
+      collectionsByGallery.set(gid, list);
+    }
+  }
+
+  const countByGallery = new Map<number, number>();
+  const firstMediaByGallery = new Map<number, Media>();
+  for (const doc of mediaRes.docs as Media[]) {
+    const gid =
+      typeof doc.gallery === "object" && doc.gallery !== null
+        ? doc.gallery.id
+        : doc.gallery ?? 0;
+    if (!gid) continue;
+    countByGallery.set(gid, (countByGallery.get(gid) ?? 0) + 1);
+    if (!firstMediaByGallery.has(gid)) {
+      firstMediaByGallery.set(gid, doc);
+    }
+  }
+
+  return galleries.map((gallery) => {
+    const fallback = firstMediaByGallery.get(gallery.id);
+    const hasCover = Boolean(gallery.cover_image);
+    return {
+      ...gallery,
+      photo_count: countByGallery.get(gallery.id) ?? 0,
+      collections: collectionsByGallery.get(gallery.id) ?? [],
+      cover_image: hasCover
+        ? gallery.cover_image
+        : fallback
+        ? mediaUrl(fallback, "medium")
+        : null,
+      cover_sizes: hasCover
+        ? gallery.cover_sizes
+        : fallback
+        ? mediaSizes(fallback)
+        : null,
+      cover_width: hasCover ? gallery.cover_width : fallback?.width ?? null,
+      cover_height: hasCover ? gallery.cover_height : fallback?.height ?? null,
+    };
+  });
+}
+
 export async function getGalleriesPaginated(
   opts: GetGalleriesOptions = {}
 ): Promise<PaginatedResult<GalleryRow>> {
-  const supabase = await createClient();
-
   const page = Math.max(1, opts.page ?? 1);
-  const rawPageSize = opts.pageSize ?? 20;
-  const pageSize = Math.min(Math.max(rawPageSize, 1), 100); // clamp 1..100
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const pageSize = Math.min(Math.max(opts.pageSize ?? 20, 1), 100);
 
-  let query = supabase
-    .from("galleries")
-    .select("*", { count: "exact" })
-    .range(from, to);
+  try {
+    const payload = await getPayloadClient();
+    const and: Where[] = [];
 
-  // Filtering
-  if (opts.publicOnly) {
-    query = query.eq("is_public", true);
-  }
+    if (opts.publicOnly) {
+      and.push({ isPublic: { equals: true } });
+    }
 
-  if (opts.search && opts.search.trim()) {
-    const term = `%${opts.search.trim()}%`;
-    // Wrap OR conditions with or() using PostgREST filter syntax
-    query = query.or(
-      `title.ilike.${term},description.ilike.${term},slug.ilike.${term}`
-    );
-  }
+    if (opts.collectionSlug && opts.collectionSlug !== "all") {
+      const ids = await resolveCollectionGalleryIds(opts.collectionSlug);
+      if (ids && ids.length === 0) {
+        return {
+          data: [],
+          page,
+          pageSize,
+          total: 0,
+          pageCount: 0,
+          hasMore: false,
+        };
+      }
+      if (ids?.length) {
+        and.push({ id: { in: ids } });
+      }
+    }
 
-  // Ordering
-  const orderBy = opts.orderBy ?? "created_at";
-  const ascending = opts.ascending ?? false;
-  query = query.order(orderBy, { ascending, nullsFirst: false });
+    if (opts.search?.trim()) {
+      const term = opts.search.trim();
+      and.push({
+        or: [
+          { title: { like: term } },
+          { description: { like: term } },
+          { slug: { like: term } },
+        ],
+      });
+    }
 
-  const { data, error, count } = await query;
+    const result = await payload.find({
+      collection: "galleries",
+      where: and.length ? { and } : {},
+      sort: sortFor(opts),
+      page,
+      limit: pageSize,
+      depth: 1,
+      joins: false,
+      overrideAccess: true,
+    });
 
-  if (error) {
+    const rows = result.docs.map((doc) => toGalleryRow(doc as Gallery));
+    const data = opts.includeMeta ? await enrichGalleriesMeta(rows) : rows;
+
+    return {
+      data,
+      page,
+      pageSize,
+      total: result.totalDocs,
+      pageCount: result.totalPages,
+      hasMore: result.hasNextPage,
+    };
+  } catch (error) {
     return {
       data: [],
       page,
@@ -72,219 +213,180 @@ export async function getGalleriesPaginated(
       total: 0,
       pageCount: 0,
       hasMore: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Failed to load galleries",
     };
   }
-
-  const total = count ?? 0;
-  const pageCount = total === 0 ? 0 : Math.ceil(total / pageSize);
-  const hasMore = page < pageCount;
-
-  return {
-    data: data ?? [],
-    page,
-    pageSize,
-    total,
-    pageCount,
-    hasMore,
-  };
 }
 
-/**
- * Convenience function for cursor-based (created_at, id) forward pagination.
- * Returns next cursor token if more rows exist.
- */
-export interface CursorPageOptions {
-  limit?: number; // default 20
-  cursor?: { created_at: string; id: number }; // last item from previous page
-  publicOnly?: boolean;
-  search?: string;
-}
-
-export interface CursorPageResult<T> {
-  data: T[];
-  nextCursor?: { created_at: string; id: number }; // pass back into cursor option
-  error?: string;
-}
-
-export async function getGalleriesCursorPage(
-  opts: CursorPageOptions = {}
-): Promise<CursorPageResult<GalleryRow>> {
-  const supabase = await createClient();
-  const limit = Math.min(Math.max(opts.limit ?? 20, 1), 100);
-
-  let query = supabase
-    .from("galleries")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    })
-    .order("id", { ascending: false });
-
-  if (opts.publicOnly) query = query.eq("is_public", true);
-  if (opts.search && opts.search.trim()) {
-    const term = `%${opts.search.trim()}%`;
-    query = query.or(
-      `title.ilike.${term},description.ilike.${term},slug.ilike.${term}`
-    );
-  }
-
-  if (opts.cursor) {
-    // For (created_at DESC, id DESC) cursor: select rows where
-    // created_at < cursor.created_at OR (created_at = cursor.created_at AND id < cursor.id)
-    const { created_at, id } = opts.cursor;
-    // PostgREST doesn't support direct complex OR with parentheses easily via helpers, use or() string.
-    // Need to URL encode commas but library handles it. Build logical expression:
-    // created_at.lt.<ts>,and(created_at.eq.<ts>,id.lt.<id>)
-    const expr = `created_at.lt.${created_at},and(created_at.eq.${created_at},id.lt.${id})`;
-    query = query.or(expr);
-  }
-
-  const { data, error } = await query.limit(limit + 1); // fetch one extra to detect more
-
-  if (error) {
-    return { data: [], error: error.message };
-  }
-
-  const rows = data ?? [];
-  let nextCursor: CursorPageResult<GalleryRow>["nextCursor"];
-  if (rows.length > limit) {
-    const last = rows[limit - 1];
-    nextCursor = { created_at: last.created_at, id: last.id };
-  }
-
-  return { data: rows.slice(0, limit), nextCursor };
-}
-
-// Fetch a single gallery by id
 export async function getGalleryById(id: number): Promise<GalleryRow | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("galleries")
-    .select("*")
-    .eq("id", id)
-    .single();
-  if (error) return null;
-  return data;
+  try {
+    const payload = await getPayloadClient();
+    const doc = await payload.findByID({
+      collection: "galleries",
+      id,
+      depth: 1,
+      joins: false,
+      overrideAccess: true,
+    });
+    return doc ? toGalleryRow(doc as Gallery) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getGalleryBySlug(
+  slug: string,
+  opts: { includeMeta?: boolean } = {}
+): Promise<GalleryRow | null> {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "galleries",
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 1,
+      joins: false,
+      overrideAccess: true,
+    });
+    const doc = result.docs[0];
+    if (!doc) return null;
+    const row = toGalleryRow(doc as Gallery);
+    if (!opts.includeMeta) return row;
+    const [enriched] = await enrichGalleriesMeta([row]);
+    return enriched ?? row;
+  } catch {
+    return null;
+  }
 }
 
 export interface GalleryWithPhotos extends GalleryRow {
-  photos: {
-    id: string;
-    filename: string;
-    storage_key: string;
-    caption: string | null;
-    created_at: string;
-    is_featured: boolean;
-    metadata?: any | null;
-    gallery_id?: number;
-  }[];
+  photos: PhotoRow[];
 }
 
 export async function getGalleryWithPhotos(
   id: number,
   opts: { limit?: number } = {}
 ): Promise<GalleryWithPhotos | null> {
-  const supabase = await createClient();
-  const gallery = await getGalleryById(id);
-  if (!gallery) return null;
-  const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500);
-  const { data: photos } = await supabase
-    .from("photos")
-    .select(
-      "id,filename,storage_key,caption,created_at,is_featured,metadata,gallery_id"
-    )
-    .eq("gallery_id", id)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  return { ...gallery, photos: photos ?? [] };
-}
-export async function getGalleryBySlug(
-  slug: string
-): Promise<GalleryRow | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("galleries")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-  if (error) return null;
-  return data;
+  try {
+    const base = await getGalleryById(id);
+    if (!base) return null;
+
+    const [gallery] = await enrichGalleriesMeta([base]);
+    const payload = await getPayloadClient();
+    const limit = Math.min(Math.max(opts.limit ?? 100, 1), 500);
+
+    const media = await payload.find({
+      collection: "media",
+      where: { gallery: { equals: id } },
+      sort: "-createdAt",
+      limit,
+      depth: 0,
+      overrideAccess: true,
+    });
+
+    return {
+      ...gallery,
+      photos: media.docs.map((doc) => toPhotoRow(doc as Media)),
+    };
+  } catch {
+    return null;
+  }
 }
 
-// Fetch specific galleries for homepage display
-// Returns specific galleries by IDs or slugs, plus up to `photosPerGallery` recent photos
 export async function getHomepageGalleries(
   options: {
     galleryIds?: number[];
     gallerySlugs?: string[];
     photosPerGallery?: number;
-    fallbackToRecent?: boolean; // if true, fall back to recent galleries if specific ones not found
+    fallbackToRecent?: boolean;
   } = {}
-) {
-  const supabase = await createClient();
-  const photosPerGallery = Math.min(
-    Math.max(options.photosPerGallery ?? 1, 0),
-    8
-  );
+): Promise<GalleryWithPhotos[]> {
+  try {
+    const payload = await getPayloadClient();
+    const photosPerGallery = Math.min(
+      Math.max(options.photosPerGallery ?? 1, 0),
+      8
+    );
 
-  let galleries: GalleryRow[] = [];
+    const baseWhere: Where = { isPublic: { equals: true } };
+    let docs: Gallery[] = [];
 
-  // First try to get specific galleries by IDs
-  if (options.galleryIds?.length) {
-    const { data: galleriesByIds, error } = await supabase
-      .from("galleries")
-      .select("*")
-      .in("id", options.galleryIds)
-      .eq("is_public", true);
-
-    if (!error && galleriesByIds) {
-      galleries = galleriesByIds;
+    if (options.galleryIds?.length) {
+      const result = await payload.find({
+        collection: "galleries",
+        where: {
+          and: [baseWhere, { id: { in: options.galleryIds } }],
+        },
+        depth: 1,
+        joins: false,
+        limit: options.galleryIds.length,
+        overrideAccess: true,
+      });
+      docs = result.docs as Gallery[];
     }
-  }
 
-  // If no galleries found by IDs, try by slugs
-  if (galleries.length === 0 && options.gallerySlugs?.length) {
-    const { data: galleriesBySlugs, error } = await supabase
-      .from("galleries")
-      .select("*")
-      .in("slug", options.gallerySlugs)
-      .eq("is_public", true);
-
-    if (!error && galleriesBySlugs) {
-      galleries = galleriesBySlugs;
+    if (!docs.length && options.gallerySlugs?.length) {
+      const result = await payload.find({
+        collection: "galleries",
+        where: {
+          and: [baseWhere, { slug: { in: options.gallerySlugs } }],
+        },
+        depth: 1,
+        joins: false,
+        limit: options.gallerySlugs.length,
+        overrideAccess: true,
+      });
+      const order = new Map(
+        options.gallerySlugs.map((slug, index) => [slug, index])
+      );
+      docs = (result.docs as Gallery[]).sort(
+        (a, b) => (order.get(a.slug) ?? 0) - (order.get(b.slug) ?? 0)
+      );
     }
-  }
 
-  // Fallback to recent galleries if no specific ones found and fallback is enabled
-  if (galleries.length === 0 && options.fallbackToRecent) {
-    const { data: recentGalleries, error } = await supabase
-      .from("galleries")
-      .select("*")
-      .eq("is_public", true)
-      .order("created_at", { ascending: false })
-      .limit(3);
-
-    if (!error && recentGalleries) {
-      galleries = recentGalleries;
+    if (!docs.length && options.fallbackToRecent) {
+      const result = await payload.find({
+        collection: "galleries",
+        where: baseWhere,
+        sort: "-createdAt",
+        limit: 3,
+        depth: 1,
+        joins: false,
+        overrideAccess: true,
+      });
+      docs = result.docs as Gallery[];
     }
+
+    if (!docs.length) return [];
+
+    const galleries = docs.map((doc) => toGalleryRow(doc));
+    if (photosPerGallery === 0) {
+      return galleries.map((gallery) => ({ ...gallery, photos: [] }));
+    }
+
+    const ids = galleries.map((gallery) => gallery.id);
+    const media = await payload.find({
+      collection: "media",
+      where: { gallery: { in: ids } },
+      sort: "-createdAt",
+      limit: Math.max(ids.length * photosPerGallery * 3, photosPerGallery),
+      depth: 0,
+      overrideAccess: true,
+    });
+
+    const grouped = new Map<number, PhotoRow[]>();
+    for (const doc of media.docs) {
+      const photo = toPhotoRow(doc as Media);
+      const list = grouped.get(photo.gallery_id) ?? [];
+      if (list.length < photosPerGallery) list.push(photo);
+      grouped.set(photo.gallery_id, list);
+    }
+
+    return galleries.map((gallery) => ({
+      ...gallery,
+      photos: grouped.get(gallery.id) ?? [],
+    }));
+  } catch {
+    return [];
   }
-
-  if (!galleries.length) return [] as GalleryWithPhotos[];
-
-  if (photosPerGallery === 0)
-    return galleries.map((g) => ({ ...g, photos: [] }));
-
-  // Fetch photos for each gallery
-  const results: GalleryWithPhotos[] = [];
-  for (const g of galleries) {
-    const { data: photos } = await supabase
-      .from("photos")
-      .select("id,filename,storage_key,caption,created_at,is_featured")
-      .eq("gallery_id", g.id)
-      .order("created_at", { ascending: false })
-      .limit(photosPerGallery);
-    results.push({ ...g, photos: photos ?? [] });
-  }
-  return results;
 }

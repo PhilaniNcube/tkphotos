@@ -1,36 +1,175 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TK Media — photographer portfolio
 
-## Getting Started
+Next.js 16 App Router site with a Payload CMS admin, Turso (libSQL) database
+and Cloudflare R2 media storage.
 
-First, run the development server:
+## Stack
+
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Turbopack) |
+| CMS / admin | Payload 3 (`/admin`) |
+| Database | Turso / libSQL via `@payloadcms/db-sqlite` |
+| Media storage | Cloudflare R2 via `@payloadcms/storage-s3` |
+| Image processing | `sharp` (inside Payload) |
+
+## Content model
+
+- **Users** — photographer / staff admin accounts (Payload auth).
+- **Media** — the single image library. Every upload produces:
+  - `thumbnail` — 480px wide WebP (grids, cards, admin thumbnails)
+  - `medium` — 1280px wide WebP (featured work, covers, social previews)
+  - `full` — 2560px wide WebP (hero, lightbox / full-screen)
+  - the untouched original (kept in R2 for downloads)
+- **Galleries** — title, slug, description, event date, public flag, cover image.
+- **Photo collections** — named groups of galleries.
+- **Tags** — reusable labels for media.
+
+Frontend queries use Payload's Local API (`lib/queries/*`) and map documents to
+the existing snake_case view models in `lib/media.ts`.
+
+## Local setup
+
+> **Node version:** use Node 24 LTS (`.nvmrc` is included). The libSQL native
+> client currently crashes on process exit on Node 26/Windows *after* Payload
+> CLI commands finish; Node 24 exits cleanly.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # then fill in the values
+pnpm migrate                 # apply Payload migrations to Turso
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000> for the site and
+<http://localhost:3000/admin> for the CMS. On a fresh database Payload shows
+the **Create first user** screen.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Useful scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev                 # Next + Payload admin
+pnpm build               # production build
+pnpm migrate             # apply pending migrations to Turso
+pnpm migrate:create      # generate a migration after changing collections
+pnpm generate:types      # regenerate payload-types.ts
+pnpm generate:importmap  # regenerate the admin import map after custom components
+pnpm email:dev           # React Email preview server on :3001
+pnpm email:test -- --to=you@example.com   # send a real Resend test email
+```
 
-## Learn More
+## Email
 
-To learn more about Next.js, take a look at the following resources:
+Transactional email is built on **Resend** and **React Email**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `react-email` — templates, rendering and the local preview server
+- `resend` — delivery
+- `@payloadcms/email-resend` — Payload's auth emails (password reset, etc.)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Templates live in `emails/`:
 
-## Deploy on Vercel
+- `contact-inquiry.tsx` — internal notification for the contact form
+- `contact-autoreply.tsx` — confirmation sent to the person who wrote in
+- `components/email-layout.tsx` — shared branded shell
+- `theme.ts` — colors, spacing and typography tokens
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`lib/email/send.ts` renders the React template to HTML + plain text and sends
+it via Resend. `lib/actions/contact.tsx` sends the internal notification first,
+then the auto-reply (best-effort).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Payload is configured in `payload.config.ts`; when `RESEND_API_KEY` is present,
+the Resend adapter is attached and Payload auth emails use it. Without the key,
+the adapter is omitted so local development and builds still work.
+
+### Required env
+
+```bash
+RESEND_API_KEY=re_...
+EMAIL_FROM_ADDRESS=noreply@tkmedia.co.za   # must be on a verified Resend domain
+EMAIL_FROM_NAME=TK Media
+CONTACT_TO_EMAIL=hello@tkmedia.co.za       # where enquiries are delivered
+```
+
+Optional:
+
+```bash
+EMAIL_REPLY_TO=
+RESEND_OVERRIDE_RECIPIENT=                 # route all sends to one inbox while testing
+```
+
+Verify the sending domain in Resend before going live. For a quick test you can
+use `onboarding@resend.dev` as `EMAIL_FROM_ADDRESS`, but production sends should
+come from your verified domain.
+
+Preview templates locally:
+
+```bash
+pnpm email:dev
+# http://localhost:3001
+```
+
+## Content migration (legacy Supabase → Turso/R2)
+
+The one-off migration is idempotent and resumable:
+
+```bash
+pnpm migrate:data:export     # read-only Supabase export -> scripts/migrate/data/
+pnpm migrate:data:import     # Payload creates + sharp variants + R2 uploads
+```
+
+Useful flags:
+
+```bash
+pnpm migrate:data:import -- --skip-media       # metadata only
+pnpm migrate:data:import -- --limit-media=5    # smoke test
+pnpm migrate:data:import -- --skip-covers      # skip cover-image pass
+pnpm migrate:data:import -- --concurrency=5    # parallel uploads (default 3)
+pnpm migrate:data:import -- --update-existing  # re-apply source metadata
+```
+
+Progress and failures are written to:
+
+- `scripts/migrate/data/migration-map.json` — legacy id → Payload id map
+- `scripts/migrate/data/migration-report.json` — summary + failures
+
+Re-running the import skips records already present by `legacyId` /
+`legacyUrl`, so it is safe to resume after an interruption.
+
+> **Legacy auth:** Supabase Auth is still used for client login pages while the
+> content and media layers run on Payload. Auth can be moved to a Payload
+> `clients` collection in a follow-up pass.
+
+## Images in the frontend
+
+`lib/media.ts` exposes `mediaUrl`, `mediaSrcSet` and the `PhotoRow` view model.
+Components request the cheapest variant that is still sharp:
+
+- masonry / cards → `thumbnail`
+- featured work, covers → `medium`
+- hero / full-screen → `full`
+
+Payload-generated variants are served straight from R2 (`unoptimized` on
+`next/image`), so Vercel does not re-encode images that already exist in the
+right size and format.
+
+## Deployment notes (Vercel)
+
+1. Add `PAYLOAD_SECRET`, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, all `R2_*`
+   variables and `NEXT_PUBLIC_R2_PUBLIC_URL` to the Vercel project.
+2. Run `pnpm migrate` as part of the release/deploy step (or once from a local
+   machine) before serving traffic.
+3. Payload's default upload path goes through the server, which Vercel limits
+   to 4.5MB per request. For large camera files set `R2_CLIENT_UPLOADS=true`
+   and add a CORS rule on the R2 bucket:
+   - Allowed origins: `https://tkmedia.co.za` (and the Vercel preview domain)
+   - Allowed methods: `PUT`, `GET`, `HEAD`
+   - Allowed headers: `*` (at minimum `If-None-Match`, `Content-Type`)
+   Payload still generates the resized variants server-side after the browser
+   upload finishes.
+4. Prefer a custom domain for the R2 bucket (for example
+   `media.tkmedia.co.za`) instead of the `*.r2.dev` development URL.
+5. The R2 bucket must be publicly readable (custom domain or R2.dev) because
+   the media collection uses direct public URLs.
+6. Add a Cloudflare Cache Rule for `<media host>/media/*` with a long Edge TTL
+   (assets are content-addressed by filename and immutable). This keeps R2
+   reads and egress low.

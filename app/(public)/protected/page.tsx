@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import type { Route } from "next";
 
 import { LogoutButton } from "@/components/logout-button";
 import { createClient } from "@/lib/server";
@@ -34,7 +35,7 @@ export default async function ProtectedPage() {
   const isAdmin = await getAdmin();
 
   if (isAdmin) {
-    redirect("/dashboard");
+    redirect("/admin" as Route);
   }
 
   return (

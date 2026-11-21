@@ -1,10 +1,13 @@
-import Image from "next/image";
+import * as React from "react";
 import type { Metadata } from "next";
-import HomePageHero from "./_components/hompage-hero";
-import FeaturedPhotos from "./_components/featured-photos";
-import HomepageGalleriesGrid from "./_components/homepage-galleries-grid";
-import CollectionsCTA from "./_components/collections-cta";
-import Testimonials from "./_components/testimonials";
+import { getHomepageGalleries } from "@/lib/queries/galleries";
+import { getHeroCarouselMedia } from "@/lib/queries/editorial-media";
+import { getFeaturedPhotos } from "@/lib/queries/photos";
+import { BookingCtaBandSection } from "./_components/home/booking-cta-band-section";
+import { ClientTestimonialsSection } from "./_components/home/client-testimonials-section";
+import { FeaturedGalleriesSection } from "./_components/home/featured-galleries-section";
+import { FeaturedWorkSection } from "./_components/home/featured-work-section";
+import { HeroCarouselSection } from "./_components/home/hero-carousel-section";
 
 export const metadata: Metadata = {
   title: "TK Media | Professional Photography Services in Eastern Cape",
@@ -48,14 +51,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function HomePage() {
+  const [heroPhotos, featuredPhotos, homepageGalleries] = await Promise.all([
+    getHeroCarouselMedia(),
+    getFeaturedPhotos(3),
+    getHomepageGalleries({
+      gallerySlugs: ["swazi-luxe-opening", "dj-buja", "chippa-vs-ts-galaxy"],
+      photosPerGallery: 1,
+      fallbackToRecent: true,
+    }),
+  ]);
+
   return (
-    <>
-      <HomePageHero />
-      <FeaturedPhotos />
-      <HomepageGalleriesGrid />
-      <CollectionsCTA />
-      <Testimonials />
-    </>
+    <div className="flex w-full flex-col">
+      <HeroCarouselSection photos={heroPhotos} />
+      <FeaturedWorkSection photos={featuredPhotos} />
+      <FeaturedGalleriesSection galleries={homepageGalleries} />
+      <BookingCtaBandSection />
+      <ClientTestimonialsSection />
+    </div>
   );
 }

@@ -1,59 +1,78 @@
-import { createClient } from "../server";
-import type { Tables } from "../types";
-import type { PaginatedResult } from "./galleries"; // reuse existing generic result interface
+import type { Where } from "payload";
 
-export type PhotoRow = Tables<"photos">;
+import type { Gallery, Media } from "@/payload-types";
+
+import { toPhotoRow, type PhotoRow } from "../media";
+import { getPayloadClient } from "../payload";
+import type { PaginatedResult } from "./galleries";
+
+export type { PhotoRow } from "../media";
 
 export interface GetPhotosOptions {
-  page?: number; // 1-based
-  pageSize?: number; // default 40 clamp 1..200
-  galleryId?: number; // optional filter by gallery
-  search?: string; // matches filename or caption (ILIKE)
-  featuredOnly?: boolean; // filter is_featured = true
-  orderBy?: "created_at" | "filename"; // default created_at
-  ascending?: boolean; // default false
+  page?: number;
+  pageSize?: number;
+  galleryId?: number;
+  search?: string;
+  featuredOnly?: boolean;
+  orderBy?: "created_at" | "filename";
+  ascending?: boolean;
 }
 
-/**
- * Offset pagination for photos.
- * NOTE: For very large photo sets consider cursor pagination on (created_at, id) to avoid deep offsets.
- */
+function buildWhere(opts: GetPhotosOptions): Where {
+  const and: Where[] = [];
+
+  if (opts.galleryId !== undefined) {
+    and.push({ gallery: { equals: opts.galleryId } });
+  }
+  if (opts.featuredOnly) {
+    and.push({ isFeatured: { equals: true } });
+  }
+  if (opts.search?.trim()) {
+    const term = opts.search.trim();
+    and.push({
+      or: [
+        { filename: { like: term } },
+        { caption: { like: term } },
+        { alt: { like: term } },
+      ],
+    });
+  }
+
+  return and.length ? { and } : {};
+}
+
 export async function getPhotosPaginated(
   opts: GetPhotosOptions = {}
 ): Promise<PaginatedResult<PhotoRow>> {
-  const supabase = await createClient();
-
+  const payload = await getPayloadClient();
   const page = Math.max(1, opts.page ?? 1);
-  const rawPageSize = opts.pageSize ?? 40;
-  const pageSize = Math.min(Math.max(rawPageSize, 1), 200);
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
+  const pageSize = Math.min(Math.max(opts.pageSize ?? 40, 1), 200);
+  const direction = opts.ascending ? "" : "-";
+  const sort =
+    opts.orderBy === "filename"
+      ? `${direction}filename`
+      : `${direction}createdAt`;
 
-  let query = supabase
-    .from("photos")
-    .select("*", { count: "exact" })
-    .range(from, to);
+  try {
+    const result = await payload.find({
+      collection: "media",
+      where: buildWhere(opts),
+      sort,
+      page,
+      limit: pageSize,
+      depth: 0,
+      overrideAccess: true,
+    });
 
-  if (opts.galleryId !== undefined) {
-    query = query.eq("gallery_id", opts.galleryId);
-  }
-
-  if (opts.featuredOnly) {
-    query = query.eq("is_featured", true);
-  }
-
-  if (opts.search && opts.search.trim()) {
-    const term = `%${opts.search.trim()}%`;
-    query = query.or(`filename.ilike.${term},caption.ilike.${term}`);
-  }
-
-  const orderBy = opts.orderBy ?? "created_at";
-  const ascending = opts.ascending ?? false;
-  query = query.order(orderBy, { ascending, nullsFirst: false });
-
-  const { data, error, count } = await query;
-
-  if (error) {
+    return {
+      data: result.docs.map((doc) => toPhotoRow(doc as Media)),
+      page,
+      pageSize,
+      total: result.totalDocs,
+      pageCount: result.totalPages,
+      hasMore: result.hasNextPage,
+    };
+  } catch (error) {
     return {
       data: [],
       page,
@@ -61,69 +80,171 @@ export async function getPhotosPaginated(
       total: 0,
       pageCount: 0,
       hasMore: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Failed to load photos",
     };
   }
-
-  const total = count ?? 0;
-  const pageCount = total === 0 ? 0 : Math.ceil(total / pageSize);
-  const hasMore = page < pageCount;
-
-  return {
-    data: data ?? [],
-    page,
-    pageSize,
-    total,
-    pageCount,
-    hasMore,
-  };
 }
 
-// Fetch a single photo by UUID id
 export async function getPhotoById(id: string): Promise<PhotoRow | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("photos")
-    .select("*")
-    .eq("id", id)
-    .single();
-  if (error) return null;
-  return data;
+  const payload = await getPayloadClient();
+
+  try {
+    if (/^\d+$/.test(id)) {
+      const doc = await payload.findByID({
+        collection: "media",
+        id: Number(id),
+        depth: 0,
+        overrideAccess: true,
+      });
+      return doc ? toPhotoRow(doc as Media) : null;
+    }
+
+    const result = await payload.find({
+      collection: "media",
+      where: { legacyId: { equals: id } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    const doc = result.docs[0];
+    return doc ? toPhotoRow(doc as Media) : null;
+  } catch {
+    return null;
+  }
+}
+
+function isFromPublicGallery(media: Media): boolean {
+  if (typeof media.gallery === "object" && media.gallery !== null) {
+    return Boolean((media.gallery as Gallery).isPublic);
+  }
+  return false;
 }
 
 export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("photos")
-    .select("*")
-    .eq("is_featured", true)
-    .limit(limit);
-  if (error) return [];
-  return data;
+  const target = Math.min(Math.max(limit, 1), 50);
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "media",
+      where: { isFeatured: { equals: true } },
+      sort: "-createdAt",
+      limit: target * 2,
+      depth: 1,
+      overrideAccess: true,
+    });
+
+    const selected: PhotoRow[] = [];
+    const seen = new Set<string>();
+
+    for (const doc of result.docs as Media[]) {
+      if (doc.gallery && !isFromPublicGallery(doc)) continue;
+      const row = toPhotoRow(doc);
+      if (!seen.has(row.id)) {
+        seen.add(row.id);
+        selected.push(row);
+      }
+      if (selected.length >= target) break;
+    }
+
+    if (selected.length < target) {
+      const fallback = await payload.find({
+        collection: "media",
+        sort: "-createdAt",
+        limit: target * 4,
+        depth: 1,
+        overrideAccess: true,
+      });
+      for (const doc of fallback.docs as Media[]) {
+        if (!isFromPublicGallery(doc)) continue;
+        const row = toPhotoRow(doc);
+        if (!seen.has(row.id)) {
+          seen.add(row.id);
+          selected.push(row);
+        }
+        if (selected.length >= target) break;
+      }
+    }
+
+    return selected;
+  } catch {
+    return [];
+  }
 }
 
-// Fetch recent photos for multiple galleries. Returns a map galleryId -> photos[]
+/** Fetch a single media item by its original UploadThing URL. */
+export async function getPhotoByLegacyUrl(
+  url: string
+): Promise<PhotoRow | null> {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "media",
+      where: { legacyUrl: { equals: url } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    const doc = result.docs[0];
+    return doc ? toPhotoRow(doc as Media) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Fetch media in the same order as the supplied legacy UploadThing URLs. */
+export async function getPhotosByLegacyUrls(
+  urls: string[]
+): Promise<PhotoRow[]> {
+  if (!urls.length) return [];
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: "media",
+      where: { legacyUrl: { in: urls } },
+      limit: urls.length,
+      depth: 0,
+      overrideAccess: true,
+    });
+
+    const byUrl = new Map(
+      result.docs.map((doc) => [(doc as Media).legacyUrl, toPhotoRow(doc as Media)])
+    );
+
+    return urls
+      .map((url) => byUrl.get(url))
+      .filter((photo): photo is PhotoRow => Boolean(photo));
+  } catch {
+    return [];
+  }
+}
+
 export async function getRecentPhotosForGalleries(
   galleryIds: number[],
   opts: { perGallery?: number } = {}
 ): Promise<Record<number, PhotoRow[]>> {
   if (!galleryIds.length) return {};
-  const perGallery = Math.min(Math.max(opts.perGallery ?? 4, 1), 24);
-  const supabase = await createClient();
-  // Fetch in a single query using in() then we'll group & slice
-  const { data, error } = await supabase
-    .from("photos")
-    .select("*")
-    .in("gallery_id", galleryIds)
-    .order("created_at", { ascending: false })
-    .limit(galleryIds.length * perGallery * 2); // over-fetch a bit then slice per group
-  if (error || !data) return {};
-  const grouped: Record<number, PhotoRow[]> = {};
-  for (const p of data) {
-    if (!grouped[p.gallery_id]) grouped[p.gallery_id] = [];
-    if (grouped[p.gallery_id].length < perGallery) {
-      grouped[p.gallery_id].push(p);
+
+  try {
+    const payload = await getPayloadClient();
+    const perGallery = Math.min(Math.max(opts.perGallery ?? 4, 1), 24);
+    const result = await payload.find({
+      collection: "media",
+      where: { gallery: { in: galleryIds } },
+      sort: "-createdAt",
+      limit: galleryIds.length * perGallery * 3,
+      depth: 0,
+      overrideAccess: true,
+    });
+
+    const grouped: Record<number, PhotoRow[]> = {};
+    for (const doc of result.docs) {
+      const photo = toPhotoRow(doc as Media);
+      const list = grouped[photo.gallery_id] ?? [];
+      if (list.length < perGallery) list.push(photo);
+      grouped[photo.gallery_id] = list;
     }
+    return grouped;
+  } catch {
+    return {};
   }
-  return grouped;
 }

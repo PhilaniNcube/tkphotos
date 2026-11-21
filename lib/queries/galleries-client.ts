@@ -1,49 +1,38 @@
-import { createClient } from "../client";
 import type {
   GetGalleriesOptions,
   PaginatedResult,
   GalleryRow,
-} from "./galleries";
+} from "@/lib/queries/galleries";
 
-/**
- * Client-side version of getGalleriesPaginated for use in client components.
- * Uses the browser client instead of the server client.
- */
 export async function getGalleriesPaginatedClient(
   opts: GetGalleriesOptions = {}
 ): Promise<PaginatedResult<GalleryRow>> {
-  const supabase = createClient();
-
-  const page = Math.max(1, opts.page ?? 1);
-  const rawPageSize = opts.pageSize ?? 20;
-  const pageSize = Math.min(Math.max(rawPageSize, 1), 100); // clamp 1..100
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-
-  let query = supabase
-    .from("galleries")
-    .select("*", { count: "exact" })
-    .range(from, to);
-
-  // Filtering
-  if (opts.publicOnly) {
-    query = query.eq("is_public", true);
+  const params = new URLSearchParams();
+  if (opts.page) params.set("page", String(opts.page));
+  if (opts.pageSize) params.set("pageSize", String(opts.pageSize));
+  if (opts.publicOnly) params.set("publicOnly", "true");
+  if (opts.collectionSlug && opts.collectionSlug !== "all") {
+    params.set("collection", opts.collectionSlug);
   }
-
-  if (opts.search?.trim()) {
-    const search = `%${opts.search.trim()}%`;
-    query = query.or(`title.ilike.${search},description.ilike.${search}`);
+  if (opts.includeMeta) params.set("includeMeta", "true");
+  if (opts.orderBy) params.set("orderBy", opts.orderBy);
+  if (typeof opts.ascending === "boolean") {
+    params.set("ascending", String(opts.ascending));
   }
+  if (opts.search?.trim()) params.set("search", opts.search.trim());
 
-  // Ordering
-  const orderBy = opts.orderBy ?? "created_at";
-  const ascending = opts.ascending ?? false;
-  query = query.order(orderBy, { ascending });
-
-  const { data, error, count } = await query;
-
-  if (error) {
+  try {
+    const response = await fetch(`/api/content/galleries?${params}`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+    return (await response.json()) as PaginatedResult<GalleryRow>;
+  } catch (error) {
     console.error("getGalleriesPaginatedClient error:", error);
+    const page = Math.max(1, opts.page ?? 1);
+    const pageSize = Math.min(Math.max(opts.pageSize ?? 20, 1), 100);
     return {
       data: [],
       page,
@@ -51,20 +40,7 @@ export async function getGalleriesPaginatedClient(
       total: 0,
       pageCount: 0,
       hasMore: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : "Failed to load galleries",
     };
   }
-
-  const total = count ?? 0;
-  const pageCount = pageSize > 0 ? Math.ceil(total / pageSize) : 0;
-  const hasMore = page < pageCount;
-
-  return {
-    data: data ?? [],
-    page,
-    pageSize,
-    total,
-    pageCount,
-    hasMore,
-  };
 }

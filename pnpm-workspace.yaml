@@ -1,2 +1,9 @@
+allowBuilds:
+  '@swc/core': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  msgpackr-extract: true
+  sharp: true
+  unrs-resolver: true
 onlyBuiltDependencies:
-  - supabase
+  - sharp
