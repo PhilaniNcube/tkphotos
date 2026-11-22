@@ -26,6 +26,7 @@ const staticLinks: Array<{ href: Route; label: string }> = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
+  { href: "/blog" as Route, label: "Blog" },
 ];
 
 export function DesktopNavMenu({

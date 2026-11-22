@@ -72,6 +72,7 @@ export interface Config {
     galleries: Gallery;
     'photo-collections': PhotoCollection;
     tags: Tag;
+    posts: Post;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     'photo-collections': PhotoCollectionsSelect<false> | PhotoCollectionsSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -286,6 +288,50 @@ export interface PhotoCollection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  /**
+   * Lowercase, alphanumeric and hyphen separated. Auto-generated from the title when left blank.
+   */
+  slug: string;
+  /**
+   * Short summary shown on the blog index and in search results.
+   */
+  excerpt?: string | null;
+  /**
+   * Used for the blog card, post header and social previews.
+   */
+  coverImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  author?: string | null;
+  status: 'draft' | 'published';
+  /**
+   * Posts appear on the public blog from this date once published.
+   */
+  publishedAt?: string | null;
+  tags?: (number | Tag)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -327,6 +373,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tags';
         value: number | Tag;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -491,6 +541,23 @@ export interface PhotoCollectionsSelect<T extends boolean = true> {
 export interface TagsSelect<T extends boolean = true> {
   name?: T;
   legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  excerpt?: T;
+  coverImage?: T;
+  content?: T;
+  author?: T;
+  status?: T;
+  publishedAt?: T;
+  tags?: T;
   updatedAt?: T;
   createdAt?: T;
 }

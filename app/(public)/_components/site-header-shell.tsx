@@ -1,6 +1,8 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
+import { AppButton } from "@/components/ui-sdk/button";
 
 interface SiteHeaderShellProps {
   mobileNav: React.ReactNode;
@@ -31,9 +33,20 @@ export function SiteHeaderShell({
           </Link>
         </div>
 
-        <div className="hidden md:block">{desktopNav}</div>
-
-        {/* <UserMenu userData={userData} /> */}
+        <div className="flex items-center gap-3">
+          <div className="hidden md:block">{desktopNav}</div>
+          <AppButton
+            variant="primary"
+            size="sm"
+            className="hidden h-9 gap-2 rounded-full pl-4 pr-1.5 lg:inline-flex"
+            render={<Link href="/contact" />}
+          >
+            <span>Book a Shoot</span>
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-tertiary-fixed text-on-tertiary-fixed">
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
+          </AppButton>
+        </div>
       </div>
     </header>
   );

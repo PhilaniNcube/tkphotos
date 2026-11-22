@@ -14,6 +14,7 @@ import {
   DrawerTrigger,
 } from "@ui-sdk/react/drawer";
 import {
+  BookOpen,
   Camera,
   Home,
   Images,
@@ -39,6 +40,7 @@ const primaryNavItems: Array<{
   { href: "/", label: "Home", icon: Home },
   { href: "/about", label: "About", icon: UserCheck },
   { href: "/services", label: "Services", icon: Camera },
+  { href: "/blog" as Route, label: "Blog", icon: BookOpen },
   { href: "/galleries", label: "Galleries", icon: Images },
   { href: "/collections", label: "Collections", icon: Layers },
   { href: "/contact", label: "Contact", icon: Mail },

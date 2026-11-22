@@ -1,4 +1,4 @@
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import type { Where } from "payload";
 
 import type { Gallery, Media, PhotoCollection } from "@/payload-types";
@@ -311,11 +311,13 @@ export async function getHomepageGalleries(
     galleryIds?: number[];
     gallerySlugs?: string[];
     photosPerGallery?: number;
+    includeMeta?: boolean;
     fallbackToRecent?: boolean;
   } = {}
 ): Promise<GalleryWithPhotos[]> {
   "use cache";
-  cacheLife("minutes");
+  cacheLife("days");
+  cacheTag("homepage", "homepage-featured-galleries");
 
   try {
     const payload = await getPayloadClient();
@@ -375,7 +377,10 @@ export async function getHomepageGalleries(
 
     if (!docs.length) return [];
 
-    const galleries = docs.map((doc) => toGalleryRow(doc));
+    const baseGalleries = docs.map((doc) => toGalleryRow(doc));
+    const galleries = options.includeMeta
+      ? await enrichGalleriesMeta(baseGalleries)
+      : baseGalleries;
     if (photosPerGallery === 0) {
       return galleries.map((gallery) => ({ ...gallery, photos: [] }));
     }

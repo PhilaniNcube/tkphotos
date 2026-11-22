@@ -8,6 +8,7 @@ import {
   getGalleriesPaginated,
   type GalleryRow,
 } from "@/lib/queries/galleries";
+import { getAllPostSlugs } from "@/lib/queries/posts";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connection();
@@ -20,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     pageSize: 100,
     publicOnly: true,
   });
+  const posts = await getAllPostSlugs();
 
   const collections = collectionsResult.data;
   const galleries = galleriesResult.data;
@@ -63,6 +65,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/auth/login`,
       lastModified: new Date(),
       changeFrequency: "yearly" as const,
@@ -104,5 +112,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...collectionRoutes, ...galleryRoutes];
+  // Dynamic blog routes
+  const postRoutes = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.published_at),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...collectionRoutes, ...galleryRoutes, ...postRoutes];
 }

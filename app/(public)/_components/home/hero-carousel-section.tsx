@@ -1,153 +1,191 @@
-"use client";
-
 import * as React from "react";
-import Link from "next/link";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselIndicator,
-  CarouselIndicatorGroup,
-  CarouselItem,
-  CarouselNext,
-  CarouselPlayToggle,
-  CarouselPrevious,
-  CarouselViewport,
-} from "@ui-sdk/react/carousel";
-import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { AppButton } from "@/components/ui-sdk/button";
-import { R2Image } from "@/components/ui-sdk/r2-image";
-import { photoSrcSet, type PhotoRow } from "@/lib/media";
-import { photoSrc } from "@/lib/utils";
+import type { HeroSlide } from "@/lib/queries/editorial-media";
+import { HeroCarouselClient } from "./hero-carousel-client";
 
-interface HeroCarouselSectionProps {
-  photos: PhotoRow[];
+const R2_BASE = (
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
+  "https://pub-b79d4510b2274749bab0c670fd9bdfa5.r2.dev"
+).replace(/\/+$/, "");
+
+function staticHeroPhoto(opts: {
+  id: string;
+  baseName: string;
+  ext: string;
+  caption: string;
+  createdAt: string;
+  galleryId: number;
+  galleryTitle: string;
+  gallerySlug: string;
+  width: number;
+  height: number;
+}) {
+  const {
+    id,
+    baseName,
+    ext,
+    caption,
+    createdAt,
+    galleryId,
+    galleryTitle,
+    gallerySlug,
+    width,
+    height,
+  } = opts;
+  return {
+    id,
+    filename: `${baseName}.${ext}`,
+    storage_key: `${R2_BASE}/media/${baseName}-1280x853.webp`,
+    url: `${R2_BASE}/media/${baseName}.${ext}`,
+    caption: null,
+    alt: caption,
+    created_at: createdAt,
+    is_featured: false,
+    gallery_id: galleryId,
+    gallery_title: galleryTitle,
+    gallery_slug: gallerySlug,
+    width,
+    height,
+    metadata: { width, height, type: "jpeg" },
+    sizes: {
+      thumbnail: {
+        url: `${R2_BASE}/media/${baseName}-480x320.webp`,
+        width: 480,
+        height: 320,
+        mimeType: "image/webp",
+      },
+      medium: {
+        url: `${R2_BASE}/media/${baseName}-1280x853.webp`,
+        width: 1280,
+        height: 853,
+        mimeType: "image/webp",
+      },
+      full: {
+        url: `${R2_BASE}/media/${baseName}-2560x1707.webp`,
+        width: 2560,
+        height: 1707,
+        mimeType: "image/webp",
+      },
+    },
+  };
 }
 
-export function HeroCarouselSection({ photos }: HeroCarouselSectionProps) {
-  const hasPhotos = photos.length > 0;
+export const HERO_SLIDES: HeroSlide[] = [
+  {
+    id: "weddings",
+    discipline: "Weddings",
+    galleryTitle: "Traditional Weddings",
+    gallerySlug: "traditional-weddings",
+    location: "Eastern Cape",
+    caption:
+      "Xhosa heritage wedding portraits bathed in late-afternoon Eastern Cape light.",
+    objectPosition: "object-[65%_35%]",
+    photo: staticHeroPhoto({
+      id: "407",
+      baseName: "Keith_PHOTOS_7",
+      ext: "jpg",
+      caption:
+        "Xhosa heritage wedding portraits bathed in late-afternoon Eastern Cape light.",
+      createdAt: "2025-08-28T18:56:16.884Z",
+      galleryId: 17,
+      galleryTitle: "Traditional Weddings",
+      gallerySlug: "traditional-weddings",
+      width: 6000,
+      height: 4000,
+    }),
+  },
+  {
+    id: "live-events",
+    discipline: "Live Events",
+    galleryTitle: "Music In The Snow",
+    gallerySlug: "music-in-the-snow",
+    location: "Hogsback, EC",
+    caption:
+      "Concert stage lighting and live performance storytelling after dark.",
+    objectPosition: "object-[55%_25%]",
+    photo: staticHeroPhoto({
+      id: "271",
+      baseName: "3L0A0438",
+      ext: "jpg",
+      caption:
+        "Concert stage lighting and live performance storytelling after dark.",
+      createdAt: "2025-08-25T20:33:40.344Z",
+      galleryId: 22,
+      galleryTitle: "Music In The Snow",
+      gallerySlug: "music-in-the-snow",
+      width: 6720,
+      height: 4480,
+    }),
+  },
+  {
+    id: "editorial",
+    discipline: "Editorial",
+    galleryTitle: "Matric Dance",
+    gallerySlug: "matric-dance",
+    location: "East London",
+    caption:
+      "Intimate milestone portraiture sculpted with natural window light.",
+    objectPosition: "object-[55%_30%]",
+    photo: staticHeroPhoto({
+      id: "243",
+      baseName: "3L0A8318",
+      ext: "jpg",
+      caption:
+        "Intimate milestone portraiture sculpted with natural window light.",
+      createdAt: "2025-08-25T20:17:58.552Z",
+      galleryId: 15,
+      galleryTitle: "Matric Dance",
+      gallerySlug: "matric-dance",
+      width: 6720,
+      height: 4480,
+    }),
+  },
+  {
+    id: "sports",
+    discipline: "Sports",
+    galleryTitle: "Chippa Vs TS Galaxy",
+    gallerySlug: "chippa-vs-ts-galaxy",
+    location: "Buffalo City Stadium",
+    caption:
+      "Floodlit PSL matchday intensity captured with split-second precision.",
+    objectPosition: "object-[60%_30%]",
+    photo: staticHeroPhoto({
+      id: "44",
+      baseName: "457A8925",
+      ext: "jpg",
+      caption:
+        "Floodlit PSL matchday intensity captured with split-second precision.",
+      createdAt: "2025-08-20T17:53:05.975Z",
+      galleryId: 10,
+      galleryTitle: "Chippa Vs TS Galaxy",
+      gallerySlug: "chippa-vs-ts-galaxy",
+      width: 6720,
+      height: 4480,
+    }),
+  },
+  {
+    id: "landscapes",
+    discipline: "Landscapes",
+    galleryTitle: "Landscapes",
+    gallerySlug: "landscapes",
+    location: "Amatola Highlands",
+    caption: "Storm fronts and open horizons across the Eastern Cape interior.",
+    objectPosition: "object-center",
+    photo: staticHeroPhoto({
+      id: "285",
+      baseName: "3L0A4595",
+      ext: "jpg",
+      caption:
+        "Storm fronts and open horizons across the Eastern Cape interior.",
+      createdAt: "2025-08-26T08:12:00.820Z",
+      galleryId: 24,
+      galleryTitle: "Landscapes",
+      gallerySlug: "landscapes",
+      width: 6720,
+      height: 4480,
+    }),
+  },
+];
 
-  return (
-    <section className="relative w-full overflow-hidden bg-inverse-surface text-on-primary">
-      <Carousel
-        aria-label="TK Media featured photography showcase"
-        loop
-        defaultPlaying={photos.length > 1}
-        interval={5500}
-        className="relative block w-full max-w-none"
-      >
-        <CarouselViewport className="w-full h-[76svh] min-h-[500px] max-h-[820px] md:h-[calc(100svh-4rem)] md:min-h-[620px] overflow-hidden">
-          <CarouselContent className="flex h-full gap-0">
-            {hasPhotos ? (
-              photos.map((photo, index) => (
-                <CarouselItem
-                  key={photo.id}
-                  aria-label={`Hero photograph ${index + 1} of ${photos.length}`}
-                  className="relative h-full w-full basis-full shrink-0"
-                >
-                  <R2Image
-                    src={photoSrc(photo, "full")}
-                    srcSet={photoSrcSet(photo)}
-                    sizes="100vw"
-                    alt={photo.alt || photo.caption || "TK Media Portfolio"}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    fetchPriority={index === 0 ? "high" : undefined}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </CarouselItem>
-              ))
-            ) : (
-              <CarouselItem
-                aria-label="TK Media Portfolio"
-                className="relative h-full w-full basis-full shrink-0 bg-gradient-to-br from-inverse-surface via-primary to-on-surface"
-              />
-            )}
-          </CarouselContent>
-        </CarouselViewport>
-
-        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-on-surface/65 via-on-surface/45 to-on-surface/85" />
-
-        <div className="pointer-events-none absolute inset-0 z-20 mx-auto flex max-w-4xl flex-col items-center justify-center px-6 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-on-primary/20 bg-on-surface/40 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-tertiary-fixed backdrop-blur-md">
-            <span className="h-1.5 w-1.5 rounded-full bg-tertiary-fixed" />
-            Eastern Cape &amp; South Africa
-          </span>
-          <h1 className="mb-3 text-4xl font-bold tracking-tight text-on-primary sm:text-6xl lg:text-8xl">
-            TK Media
-          </h1>
-          <p className="mb-4 text-base font-medium tracking-wide text-primary-fixed sm:text-2xl">
-            Event Photography &amp; Videography
-          </p>
-          <p className="mb-8 max-w-2xl text-xs leading-relaxed text-inverse-on-surface/90 sm:text-base">
-            Authentic visual storytelling across the Eastern Cape &amp; South
-            Africa — capturing moments with natural light, documentary
-            precision, and timeless craft.
-          </p>
-          <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-            <AppButton
-              variant="inverse"
-              size="lg"
-              render={<Link href="/galleries" />}
-            >
-              <span>Explore Galleries</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </AppButton>
-            <AppButton
-              variant="inverseOutline"
-              size="lg"
-              render={<Link href="/contact" />}
-            >
-              Book a Session
-            </AppButton>
-          </div>
-        </div>
-
-        {photos.length > 1 && (
-          <>
-            <CarouselPrevious
-              aria-label="Previous slide"
-              className="hidden md:inline-flex absolute left-6 top-1/2 z-30 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-on-primary/25 bg-on-surface/50 p-0 text-on-primary backdrop-blur-md hover:bg-on-surface/80 cursor-pointer"
-            >
-              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-            </CarouselPrevious>
-            <CarouselNext
-              aria-label="Next slide"
-              className="hidden md:inline-flex absolute right-6 top-1/2 z-30 h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-on-primary/25 bg-on-surface/50 p-0 text-on-primary backdrop-blur-md hover:bg-on-surface/80 cursor-pointer"
-            >
-              <ChevronRight className="h-5 w-5" aria-hidden="true" />
-            </CarouselNext>
-
-            <div className="absolute inset-x-0 bottom-6 z-30 flex items-center justify-center gap-3 px-4">
-              <CarouselIndicatorGroup
-                aria-label="Choose a hero slide"
-                className="flex items-center gap-2 rounded-full bg-on-surface/55 px-3.5 py-2 backdrop-blur-md"
-              >
-                {photos.map((photo, index) => (
-                  <CarouselIndicator
-                    key={photo.id}
-                    page={index + 1}
-                    aria-label={`Slide ${index + 1}`}
-                    className="h-2 w-2 rounded-full border-0 bg-on-primary/50 p-0 transition-all duration-300 hover:bg-on-primary data-[selected]:w-7 data-[selected]:bg-tertiary-fixed cursor-pointer"
-                  />
-                ))}
-              </CarouselIndicatorGroup>
-              <CarouselPlayToggle className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-on-primary/25 bg-on-surface/55 p-0 text-on-primary backdrop-blur-md hover:bg-on-surface/80 cursor-pointer">
-                {(state) => (
-                  <>
-                    {state.playing ? (
-                      <Pause className="h-3.5 w-3.5" aria-hidden="true" />
-                    ) : (
-                      <Play className="h-3.5 w-3.5" aria-hidden="true" />
-                    )}
-                    <span className="sr-only">
-                      {state.playing ? "Pause slideshow" : "Play slideshow"}
-                    </span>
-                  </>
-                )}
-              </CarouselPlayToggle>
-            </div>
-          </>
-        )}
-      </Carousel>
-    </section>
-  );
+export function HeroCarouselSection() {
+  return <HeroCarouselClient slides={HERO_SLIDES} />;
 }

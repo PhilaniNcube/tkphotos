@@ -179,7 +179,7 @@ export function toPhotoRow(media: Media): PhotoRow {
 export function photoSrcSet(photo: PhotoRow): string | undefined {
   const entries = (Object.keys(MEDIA_SIZE_WIDTHS) as MediaSizeName[])
     .map((name) => {
-      const size = photo.sizes[name];
+      const size = photo?.sizes?.[name];
       return size?.url && size.width ? `${size.url} ${size.width}w` : null;
     })
     .filter(Boolean) as string[];

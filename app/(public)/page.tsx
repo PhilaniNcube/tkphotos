@@ -1,13 +1,25 @@
 import * as React from "react";
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { getHomepageGalleries } from "@/lib/queries/galleries";
-import { getHeroCarouselMedia } from "@/lib/queries/editorial-media";
-import { getFeaturedPhotos } from "@/lib/queries/photos";
-import { BookingCtaBandSection } from "./_components/home/booking-cta-band-section";
+import {
+  BookingCtaBandFallback,
+  BookingCtaBandSection,
+} from "./_components/home/booking-cta-band-section";
 import { ClientTestimonialsSection } from "./_components/home/client-testimonials-section";
-import { FeaturedGalleriesSection } from "./_components/home/featured-galleries-section";
-import { FeaturedWorkSection } from "./_components/home/featured-work-section";
+import {
+  ExpertiseShowcaseFallback,
+  ExpertiseShowcaseSection,
+} from "./_components/home/expertise-showcase-section";
+import {
+  FeaturedGalleriesFallback,
+  FeaturedGalleriesSection,
+} from "./_components/home/featured-galleries-section";
+import {
+  FeaturedWorkFallback,
+  FeaturedWorkSection,
+} from "./_components/home/featured-work-section";
 import { HeroCarouselSection } from "./_components/home/hero-carousel-section";
+import { StudioManifestoSection } from "./_components/home/studio-manifesto-section";
 
 export const metadata: Metadata = {
   title: "TK Media | Professional Photography Services in Eastern Cape",
@@ -19,7 +31,8 @@ export const metadata: Metadata = {
     "event photography",
     "family portraits",
     "sports photography",
-    "corporate photography",
+    "conference photography",
+    "videography",
     "Thandikaya Matokazi",
     "South Africa photography",
   ],
@@ -51,24 +64,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HomePage() {
-  const [heroPhotos, featuredPhotos, homepageGalleries] = await Promise.all([
-    getHeroCarouselMedia(),
-    getFeaturedPhotos(3),
-    getHomepageGalleries({
-      gallerySlugs: ["swazi-luxe-opening", "dj-buja", "chippa-vs-ts-galaxy"],
-      photosPerGallery: 1,
-      fallbackToRecent: true,
-    }),
-  ]);
-
+export default function HomePage() {
   return (
     <div className="flex w-full flex-col">
-      <HeroCarouselSection photos={heroPhotos} />
-      <FeaturedWorkSection photos={featuredPhotos} />
-      <FeaturedGalleriesSection galleries={homepageGalleries} />
-      <BookingCtaBandSection />
+      <HeroCarouselSection />
+      <StudioManifestoSection />
+      <Suspense fallback={<ExpertiseShowcaseFallback />}>
+        <ExpertiseShowcaseSection />
+      </Suspense>
+      <Suspense fallback={<FeaturedWorkFallback />}>
+        <FeaturedWorkSection />
+      </Suspense>
+      <Suspense fallback={<FeaturedGalleriesFallback />}>
+        <FeaturedGalleriesSection />
+      </Suspense>
       <ClientTestimonialsSection />
+      <Suspense fallback={<BookingCtaBandFallback />}>
+        <BookingCtaBandSection />
+      </Suspense>
     </div>
   );
 }

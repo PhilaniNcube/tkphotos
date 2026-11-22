@@ -181,7 +181,6 @@ export async function getFeaturedPhotos(limit: number): Promise<PhotoRow[]> {
   }
 }
 
-/** Fetch a single media item by its original UploadThing URL. */
 export async function getPhotoByLegacyUrl(
   url: string
 ): Promise<PhotoRow | null> {
@@ -194,7 +193,7 @@ export async function getPhotoByLegacyUrl(
       collection: "media",
       where: { legacyUrl: { equals: url } },
       limit: 1,
-      depth: 0,
+      depth: 1,
       overrideAccess: true,
     });
     const doc = result.docs[0];
@@ -204,7 +203,6 @@ export async function getPhotoByLegacyUrl(
   }
 }
 
-/** Fetch media in the same order as the supplied legacy UploadThing URLs. */
 export async function getPhotosByLegacyUrls(
   urls: string[]
 ): Promise<PhotoRow[]> {
@@ -218,7 +216,7 @@ export async function getPhotosByLegacyUrls(
       collection: "media",
       where: { legacyUrl: { in: urls } },
       limit: urls.length,
-      depth: 0,
+      depth: 1,
       overrideAccess: true,
     });
 

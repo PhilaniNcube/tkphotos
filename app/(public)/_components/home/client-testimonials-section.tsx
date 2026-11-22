@@ -50,38 +50,34 @@ export function ClientTestimonialsSection() {
   return (
     <section className="mx-auto w-full max-w-7xl px-6 py-20 lg:px-12 lg:py-28">
       <div className="mx-auto mb-14 max-w-2xl text-center">
-        <div className="mb-3 flex items-center justify-center gap-3">
-          <span className="font-mono text-xs font-semibold tracking-widest text-primary">
-            03
-          </span>
-          <span className="h-0.5 w-8 bg-tertiary-container" />
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-on-surface-variant">
-            Client Stories
-          </span>
-        </div>
         <h2 className="text-3xl font-bold tracking-tight text-on-surface sm:text-4xl">
           Trusted Across the Eastern Cape
         </h2>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
-        {testimonials.map((testimonial) => (
+        {testimonials.map((testimonial, index) => (
           <article
             key={testimonial.id}
-            className="flex flex-col justify-between gap-6 rounded-xl border border-outline-variant/40 bg-surface-container-low p-7 shadow-sm transition-shadow hover:shadow-md"
+            className="flex flex-col justify-between gap-6 rounded-2xl border border-outline-variant/40 bg-surface-container-low p-7 shadow-sm transition-shadow hover:shadow-md"
           >
             <div>
-              <div
-                className="mb-4 flex items-center gap-1"
-                aria-label={`${testimonial.rating} out of 5 stars`}
-              >
-                {Array.from({ length: testimonial.rating }).map((_, idx) => (
-                  <Star
-                    key={idx}
-                    className="h-4 w-4 fill-tertiary-container text-tertiary-container"
-                    aria-hidden="true"
-                  />
-                ))}
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div
+                  className="flex items-center gap-1"
+                  aria-label={`${testimonial.rating} out of 5 stars`}
+                >
+                  {Array.from({ length: testimonial.rating }).map((_, idx) => (
+                    <Star
+                      key={idx}
+                      className="h-4 w-4 fill-tertiary-container text-tertiary-container"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+                <span className="font-mono text-xs font-semibold text-outline">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
               </div>
               <blockquote className="text-sm leading-relaxed text-on-surface sm:text-base">
                 &ldquo;{testimonial.content}&rdquo;
@@ -113,7 +109,7 @@ export function ClientTestimonialsSection() {
       <div className="mt-12 text-center">
         <Link
           href="/contact"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-container transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-container"
         >
           <span>Get in touch</span>
           <ArrowRight className="h-4 w-4" aria-hidden="true" />

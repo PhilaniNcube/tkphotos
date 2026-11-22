@@ -11,6 +11,7 @@ import sharp from "sharp";
 import { Galleries } from "./collections/Galleries";
 import { Media } from "./collections/Media";
 import { PhotoCollections } from "./collections/PhotoCollections";
+import { Posts } from "./collections/Posts";
 import { Tags } from "./collections/Tags";
 import { Users } from "./collections/Users";
 import { emailConfig, isEmailConfigured } from "./lib/email/config";
@@ -55,7 +56,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Galleries, PhotoCollections, Tags],
+  collections: [Users, Media, Galleries, PhotoCollections, Tags, Posts],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   email: emailAdapter,
