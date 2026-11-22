@@ -94,8 +94,8 @@ export const HERO_SLIDES: HeroSlide[] = [
     }),
   },
   {
-    id: "live-events",
-    discipline: "Live Events",
+    id: "festivals",
+    discipline: "Festivals",
     galleryTitle: "Music In The Snow",
     gallerySlug: "music-in-the-snow",
     location: "Hogsback, EC",

@@ -38,8 +38,8 @@ const HERO_SLIDE_SPECS: HeroSlideSpec[] = [
       "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvNpRVNID9kySlI8Mc6uwmOAK4qjNQnXegCFYV",
   },
   {
-    id: "live-events",
-    discipline: "Live Events",
+    id: "festivals",
+    discipline: "Festivals",
     galleryTitle: "Music In The Snow",
     gallerySlug: "music-in-the-snow",
     location: "Hogsback, EC",
@@ -148,7 +148,7 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
   {
     id: "entertainment_event",
     index: "03",
-    title: "Live Events & Concerts",
+    title: "Festivals & Concerts",
     startingRate: "From R5 000",
     summary:
       "High-energy concerts, festivals, and live stage photography capturing dramatic lighting and crowd atmosphere.",

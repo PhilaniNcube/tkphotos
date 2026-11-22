@@ -148,8 +148,8 @@ const sampleHeroSlides: HeroSlide[] = [
     ),
   },
   {
-    id: "live-events",
-    discipline: "Live Events",
+    id: "festivals",
+    discipline: "Festivals",
     galleryTitle: "Music In The Snow",
     gallerySlug: "music-in-the-snow",
     location: "Hogsback, EC",
@@ -261,7 +261,7 @@ const sampleExpertiseItems: HomepageExpertiseItem[] = [
   {
     id: "entertainment_event",
     index: "03",
-    title: "Live Events & Concerts",
+    title: "Festivals & Concerts",
     startingRate: "From R5 000",
     summary:
       "High-energy concerts, festivals, and live stage photography.",
@@ -494,7 +494,7 @@ describe("HeroCarouselSection", () => {
       await waitFor(() => {
         for (const pill of [
           "Weddings",
-          "Live Events",
+          "Festivals",
           "Editorial",
           "Sports",
           "Landscapes",
