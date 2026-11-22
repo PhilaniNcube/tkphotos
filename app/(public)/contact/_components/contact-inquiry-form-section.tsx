@@ -26,24 +26,31 @@ import {
   contactSchema,
   SERVICE_OPTIONS,
   type ContactInput,
+  type ServiceSelectOption,
 } from "@/lib/schema";
 
 interface ContactInquiryFormSectionProps {
   initialService?: string;
+  serviceOptions?: ServiceSelectOption[];
 }
 
 type FieldErrors = Partial<Record<"name" | "email" | "service" | "message", string>>;
 
-function extractEstimateBadge(serviceValue: string): string {
+function extractEstimateBadge(
+  serviceValue: string,
+  options: ServiceSelectOption[]
+): string {
   if (!serviceValue) return "Custom Quote";
-  const match = SERVICE_OPTIONS.find((opt) => opt.value === serviceValue);
+  const match = options.find((opt) => opt.value === serviceValue);
   if (!match) return "Custom Quote";
+  if (match.rate) return `Est. ${match.rate}`;
   const rateMatch = match.label.match(/\(([^)]+)\)/);
   return rateMatch ? `Est. ${rateMatch[1]}` : "Custom Quote";
 }
 
 export function ContactInquiryFormSection({
   initialService = "",
+  serviceOptions = SERVICE_OPTIONS,
 }: ContactInquiryFormSectionProps) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -56,8 +63,8 @@ export function ContactInquiryFormSection({
   const [submitted, setSubmitted] = React.useState(false);
 
   const estimateLabel = React.useMemo(
-    () => extractEstimateBadge(service),
-    [service]
+    () => extractEstimateBadge(service, serviceOptions),
+    [service, serviceOptions]
   );
 
   const clearFieldError = (field: keyof FieldErrors) => {
@@ -258,7 +265,7 @@ export function ContactInquiryFormSection({
             </FieldLabel>
             <Select
               name="service"
-              items={SERVICE_OPTIONS}
+              items={serviceOptions}
               value={service || null}
               onValueChange={(next) => {
                 setService(typeof next === "string" ? next : "");
@@ -277,7 +284,7 @@ export function ContactInquiryFormSection({
                 className="z-50 max-h-72 w-[var(--anchor-width)] overflow-y-auto rounded-xl border border-outline-variant bg-surface-container-lowest p-1.5 shadow-xl"
               >
                 <SelectList className="flex flex-col gap-0.5">
-                  {SERVICE_OPTIONS.map((option) => (
+                  {serviceOptions.map((option) => (
                     <SelectItem
                       key={option.value}
                       value={option.value}

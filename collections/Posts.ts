@@ -4,14 +4,23 @@ import { isAdmin } from "./access";
 import { slugField } from "./fields/slug";
 
 /**
+ * Cached so the cutoff can be part of the prerender. A scheduled post can
+ * appear up to one default cache lifetime (15 minutes) late.
+ */
+async function getPublishCutoff(): Promise<string> {
+  "use cache";
+  return new Date().toISOString();
+}
+
+/**
  * Public visitors only see published posts whose publish date has arrived.
  * Logged-in staff can read drafts and scheduled posts from the admin panel.
  */
-const publicOrStaffRead: Access = ({ req }) => {
+const publicOrStaffRead: Access = async ({ req }) => {
   if (req.user) return true;
   return {
     status: { equals: "published" },
-    publishedAt: { less_than_equal: new Date().toISOString() },
+    publishedAt: { less_than_equal: await getPublishCutoff() },
   };
 };
 

@@ -6,7 +6,8 @@ import { ContactAutoReplyEmail, ContactInquiryEmail } from "@/emails";
 import { emailConfig, isEmailConfigured } from "@/lib/email/config";
 import { sendEmail } from "@/lib/email/send";
 
-import { ContactInput, contactSchema, SERVICE_OPTIONS } from "../schema";
+import { getServiceBySlug } from "../queries/services";
+import { ContactInput, contactSchema } from "../schema";
 
 function formatSubmittedAt(date: Date): string {
   return new Intl.DateTimeFormat("en-ZA", {
@@ -16,25 +17,21 @@ function formatSubmittedAt(date: Date): string {
   }).format(date);
 }
 
-function serviceLabel(value?: string): string {
-  if (!value) return "General enquiry";
-  return (
-    SERVICE_OPTIONS.find((option) => option.value === value)?.label ??
-    "General enquiry"
-  );
-}
-
-function shortServiceLabel(value?: string): string {
-  if (!value) return "General";
-  const label = SERVICE_OPTIONS.find((option) => option.value === value)?.label;
-  return label ? label.replace(/\s*\(.*\)$/, "") : "General";
-}
-
 export async function submitContact(formData: ContactInput) {
   const parsed = contactSchema.safeParse(formData);
   if (!parsed.success) {
     return {
       error: parsed.error.issues[0]?.message ?? "Invalid input",
+    } as const;
+  }
+
+  const matchedService = parsed.data.service
+    ? await getServiceBySlug(parsed.data.service)
+    : null;
+
+  if (parsed.data.service && !matchedService) {
+    return {
+      error: "Invalid service selection",
     } as const;
   }
 
@@ -51,8 +48,10 @@ export async function submitContact(formData: ContactInput) {
 
   const submittedAt = new Date();
   const submittedAtLabel = formatSubmittedAt(submittedAt);
-  const fullService = serviceLabel(parsed.data.service);
-  const serviceForSubject = shortServiceLabel(parsed.data.service);
+  const fullService = matchedService
+    ? `${matchedService.title} (${matchedService.rate})`
+    : "General enquiry";
+  const serviceForSubject = matchedService ? matchedService.title : "General";
 
   try {
     const notification = await sendEmail({

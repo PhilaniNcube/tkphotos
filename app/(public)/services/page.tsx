@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { Metadata } from "next";
 import { getServicesHeroMedia } from "@/lib/queries/editorial-media";
+import { getActiveServices } from "@/lib/queries/services";
 import { CoreOfferingsSection } from "./_components/core-offerings-section";
 import { PackagesPricingSection } from "./_components/packages-pricing-section";
 import { ServicesHeroSection } from "./_components/services-hero-section";
@@ -49,13 +50,16 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-  const heroCards = await getServicesHeroMedia();
+  const [heroCards, services] = await Promise.all([
+    getServicesHeroMedia(),
+    getActiveServices(),
+  ]);
 
   return (
     <div className="flex w-full flex-col">
       <ServicesHeroSection cards={heroCards} />
       <CoreOfferingsSection />
-      <PackagesPricingSection />
+      <PackagesPricingSection packages={services} />
       <WorkflowAndCtaSection />
     </div>
   );

@@ -21,6 +21,7 @@
     "migrate:status": "node --env-file-if-exists=.env.local node_modules/payload/bin.js migrate:status --use-swc",
     "migrate:data:export": "node --env-file-if-exists=.env.local --import @swc-node/register/esm-register scripts/migrate/export-supabase.ts",
     "migrate:data:import": "node --env-file-if-exists=.env.local --import @swc-node/register/esm-register scripts/migrate/import-content.ts",
+    "seed:services": "node --env-file-if-exists=.env.local --import @swc-node/register/esm-register scripts/seed-services.ts",
     "email:dev": "email dev --dir ./emails --port 3001",
     "email:test": "node --env-file-if-exists=.env.local --import @swc-node/register/esm-register scripts/email/send-test.tsx"
   },

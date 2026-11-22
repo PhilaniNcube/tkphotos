@@ -12,6 +12,7 @@ import { Galleries } from "./collections/Galleries";
 import { Media } from "./collections/Media";
 import { PhotoCollections } from "./collections/PhotoCollections";
 import { Posts } from "./collections/Posts";
+import { Services } from "./collections/Services";
 import { Tags } from "./collections/Tags";
 import { Users } from "./collections/Users";
 import { emailConfig, isEmailConfigured } from "./lib/email/config";
@@ -22,8 +23,45 @@ const dirname = path.dirname(filename);
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const serverURL =
   process.env.NODE_ENV === "development" ? "http://localhost:3000" : siteUrl;
+
+/**
+ * Collect every origin a request may legitimately come from.
+ *
+ * Payload compares the browser's `Origin` header against `csrf` byte-for-byte
+ * whenever a cookie-authenticated request is not a plain GET (server actions,
+ * saves, uploads, deletes). If the site is reachable through both the apex and
+ * the `www` host, both must be listed: `NEXT_PUBLIC_SITE_URL=https://tkmedia.co.za`
+ * alone rejects `Origin: https://www.tkmedia.co.za` and Payload silently treats
+ * the request as logged out.
+ */
+const toOrigin = (value: string) => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return value.replace(/\/+$/, "");
+  }
+};
+
+const withWwwVariant = (value: string) => {
+  const origin = toOrigin(value);
+  try {
+    const { hostname, port, protocol } = new URL(origin);
+    if (hostname === "localhost" || hostname === "127.0.0.1") return [origin];
+
+    const bareHost = hostname.replace(/^www\./, "");
+    const portSuffix = port ? `:${port}` : "";
+    return [origin, `${protocol}//www.${bareHost}${portSuffix}`];
+  } catch {
+    return [origin];
+  }
+};
+
 const allowedOrigins = Array.from(
-  new Set([siteUrl, serverURL, "http://localhost:3000"])
+  new Set([
+    ...withWwwVariant(siteUrl),
+    ...withWwwVariant(serverURL),
+    "http://localhost:3000",
+  ])
 );
 const r2PublicUrl = (process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "").replace(
   /\/+$/,
@@ -56,7 +94,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Galleries, PhotoCollections, Tags, Posts],
+  collections: [Users, Media, Galleries, PhotoCollections, Tags, Posts, Services],
   cors: allowedOrigins,
   csrf: allowedOrigins,
   email: emailAdapter,

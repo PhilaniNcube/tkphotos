@@ -24,6 +24,7 @@ and Cloudflare R2 media storage.
 - **Galleries** — title, slug, description, event date, public flag, cover image.
 - **Photo collections** — named groups of galleries.
 - **Tags** — reusable labels for media.
+- **Services** — bookable packages, ZAR pricing, category, and inquiry identifiers.
 
 Frontend queries use Payload's Local API (`lib/queries/*`) and map documents to
 the existing snake_case view models in `lib/media.ts`.
@@ -52,6 +53,7 @@ pnpm dev                 # Next + Payload admin
 pnpm build               # production build
 pnpm migrate             # apply pending migrations to Turso
 pnpm migrate:create      # generate a migration after changing collections
+pnpm seed:services       # seed the Services collection with default packages
 pnpm generate:types      # regenerate payload-types.ts
 pnpm generate:importmap  # regenerate the admin import map after custom components
 pnpm email:dev           # React Email preview server on :3001

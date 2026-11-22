@@ -73,6 +73,7 @@ export interface Config {
     'photo-collections': PhotoCollection;
     tags: Tag;
     posts: Post;
+    services: Service;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     'photo-collections': PhotoCollectionsSelect<false> | PhotoCollectionsSelect<true>;
     tags: TagsSelect<false> | TagsSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -332,6 +334,44 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * Stable query identifier (e.g. anniversary_wedding). Preserves underscores and hyphens.
+   */
+  slug: string;
+  category: 'events' | 'commercial' | 'studio';
+  badge: string;
+  description: string;
+  rateLabel: 'Rate Range' | 'Flat Rate' | 'Starting From';
+  /**
+   * Formatted ZAR rate, e.g. R6 000 – R30 000 or R450.
+   */
+  rate: string;
+  icon:
+    | 'heart'
+    | 'briefcase'
+    | 'music'
+    | 'trophy'
+    | 'palette'
+    | 'sparkles'
+    | 'share2'
+    | 'camera'
+    | 'pen-tool'
+    | 'film'
+    | 'presentation'
+    | 'users';
+  featured?: boolean | null;
+  isActive?: boolean | null;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -377,6 +417,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'posts';
         value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -558,6 +602,25 @@ export interface PostsSelect<T extends boolean = true> {
   status?: T;
   publishedAt?: T;
   tags?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  category?: T;
+  badge?: T;
+  description?: T;
+  rateLabel?: T;
+  rate?: T;
+  icon?: T;
+  featured?: T;
+  isActive?: T;
+  sortOrder?: T;
   updatedAt?: T;
   createdAt?: T;
 }

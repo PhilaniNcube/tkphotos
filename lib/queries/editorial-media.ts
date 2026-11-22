@@ -373,14 +373,18 @@ export interface ServicesHeroCard {
 }
 
 export async function getServicesHeroMedia(): Promise<ServicesHeroCard[]> {
-  const [wedding, sports, corporate] = await Promise.all([
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("services", "services-hero");
+
+  const [wedding, festivals, corporate] = await Promise.all([
     resolveGalleryCoverPhoto("white-wedding"),
-    resolveGalleryCoverPhoto("varsity-cup-2025"),
+    resolveGalleryCoverPhoto("music-in-the-snow"),
     resolveGalleryCoverPhoto("vice-chancellor-s-breakfast"),
   ]);
 
   const fallbacks =
-    !wedding || !sports || !corporate ? await getFeaturedPhotos(3) : [];
+    !wedding || !festivals || !corporate ? await getFeaturedPhotos(3) : [];
 
   return [
     {
@@ -389,12 +393,12 @@ export async function getServicesHeroMedia(): Promise<ServicesHeroCard[]> {
       photo: wedding ?? fallbacks[0] ?? null,
     },
     {
-      label: "Sports & Action",
-      slug: "varsity-cup-2025",
-      photo: sports ?? fallbacks[1] ?? null,
+      label: "Festivals",
+      slug: "music-in-the-snow",
+      photo: festivals ?? fallbacks[1] ?? null,
     },
     {
-      label: "Corporate & Media",
+      label: "Conferences & Corporate Media",
       slug: "vice-chancellor-s-breakfast",
       photo: corporate ?? fallbacks[2] ?? null,
     },

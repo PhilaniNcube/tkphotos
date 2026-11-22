@@ -53,7 +53,7 @@ export function ServicesHeroSection({ cards }: ServicesHeroSectionProps) {
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-on-surface/70 via-on-surface/10 to-transparent" />
-                <span className="absolute bottom-3 left-3 text-xs font-semibold tracking-wide text-on-primary">
+                <span className="absolute bottom-3 left-3 right-3 text-left text-xs font-semibold tracking-wide text-on-primary">
                   {card.label}
                 </span>
               </Link>
