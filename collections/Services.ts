@@ -41,7 +41,14 @@ export const Services: CollectionConfig = {
   },
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "category", "rate", "isActive", "sortOrder"],
+    defaultColumns: [
+      "title",
+      "featuredImage",
+      "category",
+      "rate",
+      "isActive",
+      "sortOrder",
+    ],
     listSearchableFields: ["title", "slug", "badge", "description"],
   },
   defaultSort: "sortOrder",
@@ -127,6 +134,21 @@ export const Services: CollectionConfig = {
       type: "textarea",
       required: true,
       maxLength: 400,
+    },
+    {
+      name: "featuredImage",
+      type: "upload",
+      relationTo: "media",
+      index: true,
+      displayPreview: true,
+      // Enforced in Payload rather than at the database level so the column can
+      // be added to databases that already contain services.
+      validate: (value: unknown) =>
+        value ? true : "A featured image is required for every service.",
+      admin: {
+        description:
+          "Primary image for this service. Used on package cards, listings, and social previews.",
+      },
     },
     {
       name: "rateLabel",

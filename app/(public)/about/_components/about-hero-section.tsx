@@ -41,9 +41,7 @@ export function AboutHeroSection({ portrait }: AboutHeroSectionProps) {
             </p>
           </div>
 
-          <div className="absolute -left-8 top-8 hidden rotate-180 font-mono text-[11px] uppercase tracking-[0.25em] text-outline [writing-mode:vertical-rl] xl:block">
-            01 / THE PHOTOGRAPHER
-          </div>
+
         </div>
 
         <div className="flex flex-col justify-center space-y-6 lg:col-span-7 lg:pl-4">
@@ -51,9 +49,7 @@ export function AboutHeroSection({ portrait }: AboutHeroSectionProps) {
             <span className="rounded-full bg-primary-fixed px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-on-primary-fixed">
               About TK Media
             </span>
-            <span className="font-mono text-xs text-on-surface-variant">
-              32.7875&deg; S, 26.8475&deg; E
-            </span>
+
           </div>
 
           <h1 className="text-3xl font-bold leading-[1.12] tracking-tight text-on-surface sm:text-4xl lg:text-5xl">

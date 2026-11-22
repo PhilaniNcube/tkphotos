@@ -1,3 +1,5 @@
+import type { Media } from "@/payload-types";
+
 export type ServiceCategory = "events" | "commercial" | "studio";
 
 export type ServiceRateLabel = "Rate Range" | "Flat Rate" | "Starting From";
@@ -26,6 +28,7 @@ export interface ServicePackageItem {
   rateLabel: ServiceRateLabel;
   rate: string;
   icon: ServiceIconName;
+  featuredImage?: Media | null;
   featured: boolean;
   isActive: boolean;
   sortOrder: number;

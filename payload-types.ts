@@ -346,6 +346,10 @@ export interface Service {
   category: 'events' | 'commercial' | 'studio';
   badge: string;
   description: string;
+  /**
+   * Primary image for this service. Used on package cards, listings, and social previews.
+   */
+  featuredImage?: (number | null) | Media;
   rateLabel: 'Rate Range' | 'Flat Rate' | 'Starting From';
   /**
    * Formatted ZAR rate, e.g. R6 000 – R30 000 or R450.
@@ -615,6 +619,7 @@ export interface ServicesSelect<T extends boolean = true> {
   category?: T;
   badge?: T;
   description?: T;
+  featuredImage?: T;
   rateLabel?: T;
   rate?: T;
   icon?: T;

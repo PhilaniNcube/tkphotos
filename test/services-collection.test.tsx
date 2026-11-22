@@ -215,6 +215,12 @@ describe("ServicesHeroSection & getServicesHeroMedia", () => {
 });
 
 describe("Services Payload queries & CMS-driven components", () => {
+  const customImage = makeMediaDoc(
+    321,
+    "Aerial view of a coastal resort launch",
+    "drone"
+  );
+
   const customService: ServicePackageItem = {
     id: 99,
     slug: "drone_aerial",
@@ -225,6 +231,7 @@ describe("Services Payload queries & CMS-driven components", () => {
     rateLabel: "Rate Range",
     rate: "R3 500 – R12 000",
     icon: "film",
+    featuredImage: customImage,
     featured: false,
     isActive: true,
     sortOrder: 45,
@@ -250,10 +257,26 @@ describe("Services Payload queries & CMS-driven components", () => {
       where: { isActive: { equals: true } },
       sort: "sortOrder",
       limit: 100,
-      depth: 0,
+      depth: 1,
       overrideAccess: true,
     });
     expect(services).toEqual([customService]);
+  });
+
+  it("maps a populated featured image into the service view model", async () => {
+    const image = makeMediaDoc(
+      321,
+      "Aerial coverage at a coastal resort",
+      "drone"
+    );
+
+    mockPayloadFind.mockResolvedValueOnce({
+      docs: [{ ...customService, featuredImage: image }],
+    });
+
+    const [service] = await getActiveServices();
+
+    expect(service.featuredImage).toEqual(image);
   });
 
   it("getActiveServices falls back to DEFAULT_SERVICES when unseeded or on query error", async () => {
@@ -281,6 +304,9 @@ describe("Services Payload queries & CMS-driven components", () => {
     render(<PackagesPricingSection packages={packages} />);
 
     expect(screen.getByText("Aerial & Drone Coverage")).toBeTruthy();
+    expect(
+      screen.getByRole("img", { name: /Aerial & Drone Coverage — Aerial/i })
+    ).toBeTruthy();
     expect(
       screen
         .getByRole("link", { name: /Inquire\s*about Aerial & Drone Coverage/i })

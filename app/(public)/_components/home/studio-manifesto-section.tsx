@@ -14,9 +14,7 @@ export function StudioManifestoSection() {
     <section className="mx-auto w-full max-w-7xl bg-surface px-6 py-16 md:py-24 lg:px-12">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
         <div className="flex flex-col justify-between gap-6 lg:col-span-4">
-          <p className="font-mono text-xs text-on-surface-variant">
-            32.7875&deg; S, 26.8475&deg; E
-          </p>
+
 
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-outline">
             Thandikaya Matokazi &bull; Est. 2016

@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import type { Service } from "@/payload-types";
 
+import { isMediaDoc } from "../media";
 import { getPayloadClient } from "../payload";
 import {
   DEFAULT_SERVICES,
@@ -22,6 +23,7 @@ export function toServicePackageItem(doc: Service): ServicePackageItem {
     rateLabel: doc.rateLabel as ServiceRateLabel,
     rate: doc.rate,
     icon: doc.icon as ServiceIconName,
+    featuredImage: isMediaDoc(doc.featuredImage) ? doc.featuredImage : null,
     featured: Boolean(doc.featured),
     isActive: Boolean(doc.isActive),
     sortOrder: doc.sortOrder,
@@ -40,7 +42,7 @@ export async function getActiveServices(): Promise<ServicePackageItem[]> {
       where: { isActive: { equals: true } },
       sort: "sortOrder",
       limit: 100,
-      depth: 0,
+      depth: 1,
       overrideAccess: true,
     });
 
@@ -74,7 +76,7 @@ export async function getServiceBySlug(
         and: [{ slug: { equals: slug } }, { isActive: { equals: true } }],
       },
       limit: 1,
-      depth: 0,
+      depth: 1,
       overrideAccess: true,
     });
 
