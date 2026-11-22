@@ -113,7 +113,7 @@ export function HeroCarouselClient({ slides = [] }: HeroCarouselClientProps) {
                 </h1>
 
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
-                  Event photography, 4K videography, and documentary
+                  Event photography, portraiture, and documentary
                   storytelling across the Eastern Cape &amp; South Africa.
                 </p>
 

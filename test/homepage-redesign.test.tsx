@@ -237,30 +237,8 @@ const sampleExpertiseItems: HomepageExpertiseItem[] = [
     ),
   },
   {
-    id: "sport",
-    index: "02",
-    title: "Sports & Action",
-    startingRate: "From R4 500",
-    summary:
-      "Fast telephoto coverage capturing decisive tackles, tries, and stadium atmosphere.",
-    highlights: [
-      "Floodlit night-match capability",
-      "Rapid press & sponsor selects",
-      "PSL & Varsity Cup experience",
-    ],
-    gallerySlug: "varsity-shield",
-    galleryTitle: "Varsity Shield",
-    serviceParam: "sport",
-    photo: makePhoto(
-      "155",
-      "Varsity Shield rugby scrum",
-      "Varsity Shield",
-      "varsity-shield"
-    ),
-  },
-  {
     id: "corporate_event",
-    index: "03",
+    index: "02",
     title: "Corporate & Conferences",
     startingRate: "From R6 000",
     summary:
@@ -282,14 +260,14 @@ const sampleExpertiseItems: HomepageExpertiseItem[] = [
   },
   {
     id: "entertainment_event",
-    index: "04",
-    title: "Live Events & 4K Video",
+    index: "03",
+    title: "Live Events & Concerts",
     startingRate: "From R5 000",
     summary:
-      "High-energy concerts, festivals, and stabilized 4K recap films.",
+      "High-energy concerts, festivals, and live stage photography.",
     highlights: [
       "Low-light concert specialists",
-      "4K highlight reels & cutdowns",
+      "Rapid artist & press selects",
       "Artist & crowd atmosphere frames",
     ],
     gallerySlug: "music-in-the-snow",
@@ -304,7 +282,7 @@ const sampleExpertiseItems: HomepageExpertiseItem[] = [
   },
   {
     id: "social_media_mgmt",
-    index: "05",
+    index: "04",
     title: "Lifestyle & Media Management",
     startingRate: "From R3 000",
     summary:
@@ -501,6 +479,7 @@ describe("HeroCarouselSection", () => {
     try {
       render(<HeroCarouselSection />);
       expect(mockGetHeroCarouselSlides).not.toHaveBeenCalled();
+      expect(screen.queryByText(/4k/i)).toBeNull();
 
       const heroImgs = screen.getAllByRole("img");
       const hasHardcodedHeroFull = heroImgs.some((img) =>
@@ -649,20 +628,15 @@ describe("ExpertiseShowcaseSection", () => {
       screen.getByRole("img", { name: "Wedding couple portrait" })
     ).toBeTruthy();
 
-    const sportsTab = screen.getByRole("tab", { name: /Sports & Action/i });
-    await user.click(sportsTab);
+    expect(
+      screen.queryByRole("tab", { name: /Sports & Action/i })
+    ).toBeNull();
+    expect(screen.queryByText(/4k/i)).toBeNull();
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole("link", { name: "Inquire" }).getAttribute("href")
-      ).toBe("/contact?service=sport");
-      expect(
-        screen.getByRole("img", { name: "Varsity Shield rugby scrum" })
-      ).toBeTruthy();
+    const corporateTab = screen.getByRole("tab", {
+      name: /Corporate & Conferences/i,
     });
-
-    sportsTab.focus();
-    await user.keyboard("{ArrowDown}");
+    await user.click(corporateTab);
 
     await waitFor(() => {
       expect(
@@ -670,6 +644,18 @@ describe("ExpertiseShowcaseSection", () => {
       ).toBe("/contact?service=corporate_event");
       expect(
         screen.getByRole("img", { name: "Legislature plenary chamber" })
+      ).toBeTruthy();
+    });
+
+    corporateTab.focus();
+    await user.keyboard("{ArrowDown}");
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("link", { name: "Inquire" }).getAttribute("href")
+      ).toBe("/contact?service=entertainment_event");
+      expect(
+        screen.getByRole("img", { name: "Live saxophone performance" })
       ).toBeTruthy();
     });
 
@@ -691,7 +677,7 @@ describe("ExpertiseShowcaseSection", () => {
         {
           ref: "Photography and media disciplines",
           action: "setValue",
-          args: ["entertainment_event"],
+          args: ["social_media_mgmt"],
         },
       ],
     });
@@ -700,7 +686,7 @@ describe("ExpertiseShowcaseSection", () => {
     await waitFor(() => {
       expect(
         screen.getByRole("link", { name: "Inquire" }).getAttribute("href")
-      ).toBe("/contact?service=entertainment_event");
+      ).toBe("/contact?service=social_media_mgmt");
     });
   });
 });

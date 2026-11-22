@@ -128,26 +128,8 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
       "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxviF00soahAgsRtiElY2JK905OBNcQrwSdeFaM",
   },
   {
-    id: "sport",
-    index: "02",
-    title: "Sports & Action",
-    startingRate: "From R4 500",
-    summary:
-      "Fast telephoto coverage capturing decisive tackles, tries, and stadium atmosphere for clubs, universities, and sponsors.",
-    highlights: [
-      "Floodlit night-match capability",
-      "Rapid press & sponsor selects",
-      "PSL, Varsity Cup & Varsity Shield experience",
-    ],
-    gallerySlug: "varsity-shield",
-    galleryTitle: "Varsity Shield",
-    serviceParam: "sport",
-    legacyUrl:
-      "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvyAEC1NbSfPRtDXjI8MU9qdcQw3bVuTk0vJ2N",
-  },
-  {
     id: "corporate_event",
-    index: "03",
+    index: "02",
     title: "Corporate & Conferences",
     startingRate: "From R6 000",
     summary:
@@ -165,14 +147,14 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
   },
   {
     id: "entertainment_event",
-    index: "04",
-    title: "Live Events & 4K Video",
+    index: "03",
+    title: "Live Events & Concerts",
     startingRate: "From R5 000",
     summary:
-      "High-energy concerts, festivals, and stabilized 4K recap films pairing dramatic stage light with clean audio.",
+      "High-energy concerts, festivals, and live stage photography capturing dramatic lighting and crowd atmosphere.",
     highlights: [
       "Low-light concert specialists",
-      "4K highlight reels & cutdowns",
+      "Rapid artist & press selects",
       "Artist & crowd atmosphere frames",
     ],
     gallerySlug: "music-in-the-snow",
@@ -183,7 +165,7 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
   },
   {
     id: "social_media_mgmt",
-    index: "05",
+    index: "04",
     title: "Lifestyle & Media Management",
     startingRate: "From R3 000",
     summary:

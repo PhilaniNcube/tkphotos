@@ -25,7 +25,7 @@ export function ExpertiseShowcaseFallback() {
         </div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           <div className="space-y-2 lg:col-span-5">
-            {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
                 className="h-16 w-full rounded-xl bg-white/[0.06]"
