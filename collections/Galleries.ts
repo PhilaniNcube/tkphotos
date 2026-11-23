@@ -1,6 +1,6 @@
 import type { Access, CollectionConfig } from "payload";
 
-import { isAdmin } from "./access";
+import { isStaff } from "./access";
 import { slugField } from "./fields/slug";
 
 const publicOrStaffRead: Access = ({ req }) => {
@@ -16,9 +16,9 @@ export const Galleries: CollectionConfig = {
   },
   access: {
     read: publicOrStaffRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: isStaff,
+    update: isStaff,
+    delete: isStaff,
   },
   fields: [
     {

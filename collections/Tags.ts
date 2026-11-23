@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "./access";
+import { isStaff } from "./access";
 
 export const Tags: CollectionConfig = {
   slug: "tags",
@@ -10,9 +10,9 @@ export const Tags: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: isStaff,
+    update: isStaff,
+    delete: isStaff,
   },
   fields: [
     {

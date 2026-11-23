@@ -5,7 +5,7 @@ import type {
   CollectionConfig,
 } from "payload";
 
-import { isAdmin } from "./access";
+import { isStaff } from "./access";
 import { slugify } from "./fields/slug";
 
 const activeOrStaffRead: Access = ({ req }) => {
@@ -54,9 +54,9 @@ export const Services: CollectionConfig = {
   defaultSort: "sortOrder",
   access: {
     read: activeOrStaffRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: isStaff,
+    update: isStaff,
+    delete: isStaff,
   },
   hooks: {
     afterChange: [afterChangeHook],

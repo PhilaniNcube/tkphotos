@@ -110,6 +110,41 @@ pnpm email:dev
 # http://localhost:3001
 ```
 
+## Users and access
+
+`Users` is the Payload auth collection for the dashboard (`/admin`). There are
+two roles:
+
+| Role | Can do |
+| --- | --- |
+| **Admin** | Everything: content, media, accounts and invitations. |
+| **Editor** | Content, media and tags. The Users collection is hidden. |
+
+Accounts are **not** created by signing up. An admin invites people:
+
+1. Open `/admin` → **Users**.
+2. Use **Invite a team member** above the list: enter the email, an optional
+   name and the role, then **Send invite**.
+3. The invitee gets a branded email with a **Set my password** button. The link
+   is valid for 72 hours and opens `/admin/reset/:token`, where they choose a
+   password and land in the dashboard.
+
+The account is created with a random password the invitee never sees, so the
+email link is the only way in. Use **Resend invite** if the first email expired.
+Only admins can call `POST /api/users/invite`.
+
+The first account created on a fresh database is always promoted to **Admin**,
+and the app refuses to demote or delete the last remaining admin. Existing
+accounts created before roles existed were migrated to **Admin**.
+
+> **Testing tip:** while `RESEND_OVERRIDE_RECIPIENT` is set, every invite is
+> redirected to that inbox. The invite panel says where the email actually
+> went, so check it before inviting real people.
+
+Email templates live in `emails/`: `password.tsx` covers both invites and
+self-service password resets, and `lib/email/auth-emails.tsx` wires it into
+Payload's `forgotPassword` flow.
+
 ## Content migration (legacy Supabase → Turso/R2)
 
 The one-off migration is idempotent and resumable:

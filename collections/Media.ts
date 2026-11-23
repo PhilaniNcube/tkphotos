@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { isAdmin } from "./access";
+import { isStaff } from "./access";
 
 /**
  * Media is the single upload collection for every image on the site.
@@ -25,9 +25,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: isStaff,
+    update: isStaff,
+    delete: isStaff,
   },
   upload: {
     mimeTypes: ["image/*"],

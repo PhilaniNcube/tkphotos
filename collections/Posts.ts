@@ -1,6 +1,6 @@
 import type { Access, CollectionConfig } from "payload";
 
-import { isAdmin } from "./access";
+import { isStaff } from "./access";
 import { slugField } from "./fields/slug";
 
 /**
@@ -38,9 +38,9 @@ export const Posts: CollectionConfig = {
   defaultSort: "-publishedAt",
   access: {
     read: publicOrStaffRead,
-    create: isAdmin,
-    update: isAdmin,
-    delete: isAdmin,
+    create: isStaff,
+    update: isStaff,
+    delete: isStaff,
   },
   fields: [
     {
