@@ -110,12 +110,12 @@ interface ExpertiseSpec extends Omit<HomepageExpertiseItem, "photo"> {
 }
 
 const WEDDING_EXPERTISE_PHOTO = staticPhotoRow({
-  id: "fe8ff600",
-  baseName: "3L0A1290",
+  id: "e7154c80",
+  baseName: "3L0A0426",
   ext: "jpg",
-  directory: "fe8ff600-77ec-4886-a2e0-3d45a636503d",
-  caption: "Bride and groom at their white wedding reception table.",
-  createdAt: "2026-11-24T20:20:30.000Z",
+  directory: "e7154c80-6e97-417a-b5ce-9a4116b593b1",
+  caption: "A newlywed couple walking down the aisle through falling confetti.",
+  createdAt: "2026-11-24T22:17:24.000Z",
   galleryId: 0,
   galleryTitle: "White Wedding",
   gallerySlug: "white-wedding",
@@ -431,8 +431,8 @@ export async function getServicesHeroMedia(): Promise<ServicesHeroCard[]> {
 
   const [wedding, festivals, corporate] = await Promise.all([
     resolveGalleryCoverPhoto("white-wedding"),
-    resolveGalleryCoverPhoto("music-in-the-snow"),
-    resolveGalleryCoverPhoto("vice-chancellor-s-breakfast"),
+    resolveGalleryCoverPhoto("festivals"),
+    resolveGalleryCoverPhoto("graduation"),
   ]);
 
   const fallbacks =
