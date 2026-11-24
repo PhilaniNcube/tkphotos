@@ -129,10 +129,12 @@ export default buildConfig({
     s3Storage({
       enabled: r2Enabled,
       bucket: process.env.R2_BUCKET_NAME || "",
-      // Enable for production uploads larger than Vercel's 4.5MB request
-      // limit. Requires a CORS rule on the bucket allowing PUT from the site
-      // origin plus the If-None-Match header.
-      clientUploads: process.env.R2_CLIENT_UPLOADS === "true",
+      // Upload directly from the browser to R2 via presigned URLs so uploads
+      // larger than Vercel's 4.5 MB serverless request limit succeed in
+      // production. Requires a CORS rule on the bucket allowing PUT from the
+      // site origin plus the If-None-Match header. Set R2_CLIENT_UPLOADS=false
+      // to opt out.
+      clientUploads: process.env.R2_CLIENT_UPLOADS !== "false",
       collections: {
         media: {
           prefix: "media",
@@ -149,9 +151,13 @@ export default buildConfig({
           secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
         },
         // R2 requires region "auto" and path-style addressing.
+        // Disable automatic CRC32 checksum query parameters on presigned PUT
+        // URLs so browser direct uploads to R2 do not fail checksum validation.
         region: "auto",
         endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
         forcePathStyle: true,
+        requestChecksumCalculation: "WHEN_REQUIRED",
+        responseChecksumValidation: "WHEN_REQUIRED",
       },
     }),
   ],
