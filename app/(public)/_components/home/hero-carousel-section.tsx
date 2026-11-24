@@ -1,79 +1,7 @@
 import * as React from "react";
+import { staticPhotoRow } from "@/lib/media";
 import type { HeroSlide } from "@/lib/queries/editorial-media";
 import { HeroCarouselClient } from "./hero-carousel-client";
-
-const R2_BASE = (
-  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
-  "https://pub-b79d4510b2274749bab0c670fd9bdfa5.r2.dev"
-).replace(/\/+$/, "");
-
-function staticHeroPhoto(opts: {
-  id: string;
-  baseName: string;
-  ext: string;
-  caption: string;
-  createdAt: string;
-  galleryId: number;
-  galleryTitle: string;
-  gallerySlug: string;
-  width: number;
-  height: number;
-  /** Optional upload subfolder under /media, used by newer asset paths. */
-  directory?: string;
-}) {
-  const {
-    id,
-    baseName,
-    ext,
-    caption,
-    createdAt,
-    galleryId,
-    galleryTitle,
-    gallerySlug,
-    width,
-    height,
-    directory,
-  } = opts;
-  const assetPath = directory
-    ? `media/${directory}/${baseName}`
-    : `media/${baseName}`;
-  return {
-    id,
-    filename: `${baseName}.${ext}`,
-    storage_key: `${R2_BASE}/${assetPath}-1280x853.webp`,
-    url: `${R2_BASE}/${assetPath}.${ext}`,
-    caption: null,
-    alt: caption,
-    created_at: createdAt,
-    is_featured: false,
-    gallery_id: galleryId,
-    gallery_title: galleryTitle,
-    gallery_slug: gallerySlug,
-    width,
-    height,
-    metadata: { width, height, type: "jpeg" },
-    sizes: {
-      thumbnail: {
-        url: `${R2_BASE}/${assetPath}-480x320.webp`,
-        width: 480,
-        height: 320,
-        mimeType: "image/webp",
-      },
-      medium: {
-        url: `${R2_BASE}/${assetPath}-1280x853.webp`,
-        width: 1280,
-        height: 853,
-        mimeType: "image/webp",
-      },
-      full: {
-        url: `${R2_BASE}/${assetPath}-2560x1707.webp`,
-        width: 2560,
-        height: 1707,
-        mimeType: "image/webp",
-      },
-    },
-  };
-}
 
 export const HERO_SLIDES: HeroSlide[] = [
   {
@@ -85,7 +13,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     caption:
       "Xhosa heritage wedding portraits bathed in late-afternoon Eastern Cape light.",
     objectPosition: "object-[65%_35%]",
-    photo: staticHeroPhoto({
+    photo: staticPhotoRow({
       id: "407",
       baseName: "457A9885",
       ext: "jpg",
@@ -108,7 +36,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     caption:
       "Concert stage lighting and live performance storytelling after dark.",
     objectPosition: "object-[50%_35%]",
-    photo: staticHeroPhoto({
+    photo: staticPhotoRow({
       id: "e6ad605b",
       baseName: "3L0A8855",
       ext: "jpg",
@@ -132,7 +60,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     caption:
       "Intimate milestone portraiture sculpted with natural window light.",
     objectPosition: "object-[55%_30%]",
-    photo: staticHeroPhoto({
+    photo: staticPhotoRow({
       id: "243",
       baseName: "3L0A8318",
       ext: "jpg",
@@ -155,7 +83,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     caption:
       "White wedding family portraits captured in soft, even Eastern Cape daylight.",
     objectPosition: "object-[50%_30%]",
-    photo: staticHeroPhoto({
+    photo: staticPhotoRow({
       id: "8ebd3296",
       baseName: "file013007",
       ext: "jpg",
@@ -178,7 +106,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     location: "Amatola Highlands",
     caption: "Storm fronts and open horizons across the Eastern Cape interior.",
     objectPosition: "object-center",
-    photo: staticHeroPhoto({
+    photo: staticPhotoRow({
       id: "285",
       baseName: "3L0A4595",
       ext: "jpg",

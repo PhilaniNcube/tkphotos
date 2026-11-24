@@ -2,6 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { AppButton } from "@/components/ui-sdk/button";
+import Image from "next/image";
 
 const studioProofStats = [
   { value: "9+", label: "Years in the Field" },
@@ -16,9 +17,14 @@ export function StudioManifestoSection() {
         <div className="flex flex-col justify-between gap-6 lg:col-span-4">
 
 
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-outline">
-            Thandikaya Matokazi &bull; Est. 2016
-          </p>
+
+          <Image
+            alt=""
+            src="https://pub-b79d4510b2274749bab0c670fd9bdfa5.r2.dev/media/4bd8cc37-ca33-461d-bc98-7ceb4f881ed8/3L0A8776.jpg"
+            width={800}
+            height={1200}
+            className="rounded-md shadow-sm"
+          />
         </div>
 
         <div className="lg:col-span-8">

@@ -11,6 +11,11 @@ export interface PhotoSize {
 
 export type PhotoSizes = Partial<Record<MediaSizeName, PhotoSize>>;
 
+const R2_BASE = (
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
+  "https://pub-b79d4510b2274749bab0c670fd9bdfa5.r2.dev"
+).replace(/\/+$/, "");
+
 /** Width produced by the Payload image size config. */
 export const MEDIA_SIZE_WIDTHS: Record<MediaSizeName, number> = {
   thumbnail: 480,
@@ -137,6 +142,82 @@ export interface PhotoRow {
     type?: string;
   } | null;
   sizes: PhotoSizes;
+}
+
+export interface StaticPhotoRowOptions {
+  id: string;
+  baseName: string;
+  ext: string;
+  caption: string;
+  createdAt: string;
+  galleryId: number;
+  galleryTitle: string;
+  gallerySlug: string;
+  width: number;
+  height: number;
+  /** Optional upload subfolder under /media, used by newer asset paths. */
+  directory?: string;
+}
+
+/**
+ * Build a `PhotoRow` for an asset served straight from R2, bypassing the
+ * Payload media collection. The R2 variants must already exist next to the
+ * original upload.
+ */
+export function staticPhotoRow(opts: StaticPhotoRowOptions): PhotoRow {
+  const {
+    id,
+    baseName,
+    ext,
+    caption,
+    createdAt,
+    galleryId,
+    galleryTitle,
+    gallerySlug,
+    width,
+    height,
+    directory,
+  } = opts;
+  const assetPath = directory
+    ? `media/${directory}/${baseName}`
+    : `media/${baseName}`;
+
+  return {
+    id,
+    filename: `${baseName}.${ext}`,
+    storage_key: `${R2_BASE}/${assetPath}-1280x853.webp`,
+    url: `${R2_BASE}/${assetPath}.${ext}`,
+    caption: null,
+    alt: caption,
+    created_at: createdAt,
+    is_featured: false,
+    gallery_id: galleryId,
+    gallery_title: galleryTitle,
+    gallery_slug: gallerySlug,
+    width,
+    height,
+    metadata: { width, height, type: "jpeg" },
+    sizes: {
+      thumbnail: {
+        url: `${R2_BASE}/${assetPath}-480x320.webp`,
+        width: 480,
+        height: 320,
+        mimeType: "image/webp",
+      },
+      medium: {
+        url: `${R2_BASE}/${assetPath}-1280x853.webp`,
+        width: 1280,
+        height: 853,
+        mimeType: "image/webp",
+      },
+      full: {
+        url: `${R2_BASE}/${assetPath}-2560x1707.webp`,
+        width: 2560,
+        height: 1707,
+        mimeType: "image/webp",
+      },
+    },
+  };
 }
 
 export function toPhotoRow(media: Media): PhotoRow {

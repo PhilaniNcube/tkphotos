@@ -1,7 +1,7 @@
 import { cacheLife, cacheTag } from "next/cache";
 import type { Gallery, Media } from "@/payload-types";
 
-import { toPhotoRow, type PhotoRow } from "../media";
+import { staticPhotoRow, toPhotoRow, type PhotoRow } from "../media";
 import { getPayloadClient } from "../payload";
 import {
   getFeaturedPhotos,
@@ -106,7 +106,52 @@ export interface HomepageExpertiseItem {
 
 interface ExpertiseSpec extends Omit<HomepageExpertiseItem, "photo"> {
   legacyUrl: string;
+  photoOverride?: PhotoRow;
 }
+
+const WEDDING_EXPERTISE_PHOTO = staticPhotoRow({
+  id: "fe8ff600",
+  baseName: "3L0A1290",
+  ext: "jpg",
+  directory: "fe8ff600-77ec-4886-a2e0-3d45a636503d",
+  caption: "Bride and groom at their white wedding reception table.",
+  createdAt: "2026-11-24T20:20:30.000Z",
+  galleryId: 0,
+  galleryTitle: "White Wedding",
+  gallerySlug: "white-wedding",
+  width: 6720,
+  height: 4480,
+});
+
+const CONFERENCE_EXPERTISE_PHOTO = staticPhotoRow({
+  id: "a8060867",
+  baseName: "3L0A0018",
+  ext: "jpg",
+  directory: "a8060867-4e2e-4090-a966-d445a75030d2",
+  caption:
+    "Graduates and dignitaries seated on stage at a formal institutional ceremony.",
+  createdAt: "2026-11-24T20:25:19.000Z",
+  galleryId: 0,
+  galleryTitle: "Government Events",
+  gallerySlug: "government-events",
+  width: 6720,
+  height: 4480,
+});
+
+const FESTIVAL_EXPERTISE_PHOTO = staticPhotoRow({
+  id: "3b75f418",
+  baseName: "file011004",
+  ext: "jpg",
+  directory: "3b75f418-cfee-4e9f-a84a-c6f0047292ed",
+  caption:
+    "A live performer on stage in front of a cheering, phone-lit crowd.",
+  createdAt: "2026-11-24T20:21:08.000Z",
+  galleryId: 0,
+  galleryTitle: "Music In The Snow",
+  gallerySlug: "music-in-the-snow",
+  width: 6720,
+  height: 4480,
+});
 
 const EXPERTISE_SPECS: ExpertiseSpec[] = [
   {
@@ -126,6 +171,7 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
     serviceParam: "anniversary_wedding",
     legacyUrl:
       "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxviF00soahAgsRtiElY2JK905OBNcQrwSdeFaM",
+    photoOverride: WEDDING_EXPERTISE_PHOTO,
   },
   {
     id: "corporate_event",
@@ -144,6 +190,7 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
     serviceParam: "corporate_event",
     legacyUrl:
       "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvzZiDEcJxvl8TKprfyUAiREB67OCqk9gY03SZ",
+    photoOverride: CONFERENCE_EXPERTISE_PHOTO,
   },
   {
     id: "entertainment_event",
@@ -162,6 +209,7 @@ const EXPERTISE_SPECS: ExpertiseSpec[] = [
     serviceParam: "entertainment_event",
     legacyUrl:
       "https://uadq23xeqd.ufs.sh/f/XaFRTsN2LRxvJUvMb3KgUCBP3wZpVqzTsXFR1SijHfIvbr2c",
+    photoOverride: FESTIVAL_EXPERTISE_PHOTO,
   },
   {
     id: "social_media_mgmt",
@@ -302,7 +350,11 @@ export async function getHomepageExpertiseMedia(): Promise<
   );
 
   return EXPERTISE_SPECS.map((spec, index) => {
-    const photo = bySlug.get(spec.gallerySlug) ?? photos[index] ?? null;
+    const photo =
+      spec.photoOverride ??
+      bySlug.get(spec.gallerySlug) ??
+      photos[index] ??
+      null;
     return {
       id: spec.id,
       index: spec.index,
