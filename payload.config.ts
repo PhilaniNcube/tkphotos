@@ -114,6 +114,17 @@ export default buildConfig({
     push: false,
   }),
   sharp,
+  upload: {
+    abortOnLimit: true,
+    limits: {
+      // 50 MB per file — enforced for both server multipart uploads and
+      // presigned R2 client uploads (`R2_CLIENT_UPLOADS=true`).
+      fileSize: 50 * 1024 * 1024,
+    },
+    // 60 MB total multipart request ceiling (leaves headroom for form fields
+    // and multipart boundaries alongside a 50 MB file).
+    requestSizeLimit: 60 * 1024 * 1024,
+  },
   plugins: [
     s3Storage({
       enabled: r2Enabled,

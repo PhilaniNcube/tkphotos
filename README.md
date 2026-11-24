@@ -195,9 +195,12 @@ right size and format.
    variables and `NEXT_PUBLIC_R2_PUBLIC_URL` to the Vercel project.
 2. Run `pnpm migrate` as part of the release/deploy step (or once from a local
    machine) before serving traffic.
-3. Payload's default upload path goes through the server, which Vercel limits
-   to 4.5MB per request. For large camera files set `R2_CLIENT_UPLOADS=true`
-   and add a CORS rule on the R2 bucket:
+3. Payload and Next.js are configured to allow uploads up to **50 MB** per
+   image (`60 MB` total request ceiling). However, Payload's default upload
+   path goes through the server, which Vercel hard-caps at **4.5 MB** per
+   serverless request regardless of `next.config.ts`. For large camera files in
+   production, set `R2_CLIENT_UPLOADS=true` and add a CORS rule on the R2
+   bucket:
    - Allowed origins: `https://tkmedia.co.za` (and the Vercel preview domain)
    - Allowed methods: `PUT`, `GET`, `HEAD`
    - Allowed headers: `*` (at minimum `If-None-Match`, `Content-Type`)

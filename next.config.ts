@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   typedRoutes: true,
+  experimental: {
+    // Match Payload's 60 MB multipart request ceiling (50 MB file + overhead)
+    // so Next.js doesn't truncate uploads at the default 10 MB proxy body limit
+    // or reject admin Server Action payloads at the default 1 MB limit.
+    proxyClientMaxBodySize: "60mb",
+    serverActions: {
+      bodySizeLimit: "60mb",
+    },
+  },
   images: {
     qualities: [75],
     remotePatterns: [

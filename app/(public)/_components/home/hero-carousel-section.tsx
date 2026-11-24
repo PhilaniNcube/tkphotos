@@ -81,7 +81,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     objectPosition: "object-[65%_35%]",
     photo: staticHeroPhoto({
       id: "407",
-      baseName: "Keith_PHOTOS_7",
+      baseName: "457A9885",
       ext: "jpg",
       caption:
         "Xhosa heritage wedding portraits bathed in late-afternoon Eastern Cape light.",
