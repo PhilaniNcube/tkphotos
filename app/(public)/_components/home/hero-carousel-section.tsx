@@ -18,6 +18,8 @@ function staticHeroPhoto(opts: {
   gallerySlug: string;
   width: number;
   height: number;
+  /** Optional upload subfolder under /media, used by newer asset paths. */
+  directory?: string;
 }) {
   const {
     id,
@@ -30,12 +32,16 @@ function staticHeroPhoto(opts: {
     gallerySlug,
     width,
     height,
+    directory,
   } = opts;
+  const assetPath = directory
+    ? `media/${directory}/${baseName}`
+    : `media/${baseName}`;
   return {
     id,
     filename: `${baseName}.${ext}`,
-    storage_key: `${R2_BASE}/media/${baseName}-1280x853.webp`,
-    url: `${R2_BASE}/media/${baseName}.${ext}`,
+    storage_key: `${R2_BASE}/${assetPath}-1280x853.webp`,
+    url: `${R2_BASE}/${assetPath}.${ext}`,
     caption: null,
     alt: caption,
     created_at: createdAt,
@@ -48,19 +54,19 @@ function staticHeroPhoto(opts: {
     metadata: { width, height, type: "jpeg" },
     sizes: {
       thumbnail: {
-        url: `${R2_BASE}/media/${baseName}-480x320.webp`,
+        url: `${R2_BASE}/${assetPath}-480x320.webp`,
         width: 480,
         height: 320,
         mimeType: "image/webp",
       },
       medium: {
-        url: `${R2_BASE}/media/${baseName}-1280x853.webp`,
+        url: `${R2_BASE}/${assetPath}-1280x853.webp`,
         width: 1280,
         height: 853,
         mimeType: "image/webp",
       },
       full: {
-        url: `${R2_BASE}/media/${baseName}-2560x1707.webp`,
+        url: `${R2_BASE}/${assetPath}-2560x1707.webp`,
         width: 2560,
         height: 1707,
         mimeType: "image/webp",
@@ -101,14 +107,15 @@ export const HERO_SLIDES: HeroSlide[] = [
     location: "Hogsback, EC",
     caption:
       "Concert stage lighting and live performance storytelling after dark.",
-    objectPosition: "object-[55%_25%]",
+    objectPosition: "object-[50%_35%]",
     photo: staticHeroPhoto({
-      id: "271",
-      baseName: "3L0A0438",
+      id: "e6ad605b",
+      baseName: "3L0A8855",
       ext: "jpg",
+      directory: "e6ad605b-fbfd-45d8-9fc9-0edeb0aa5900",
       caption:
         "Concert stage lighting and live performance storytelling after dark.",
-      createdAt: "2025-08-25T20:33:40.344Z",
+      createdAt: "2026-11-24T20:19:49.000Z",
       galleryId: 22,
       galleryTitle: "Music In The Snow",
       gallerySlug: "music-in-the-snow",
@@ -140,24 +147,25 @@ export const HERO_SLIDES: HeroSlide[] = [
     }),
   },
   {
-    id: "sports",
-    discipline: "Sports",
-    galleryTitle: "Chippa Vs TS Galaxy",
-    gallerySlug: "chippa-vs-ts-galaxy",
-    location: "Buffalo City Stadium",
+    id: "white-wedding",
+    discipline: "White Wedding",
+    galleryTitle: "White Wedding",
+    gallerySlug: "white-wedding",
+    location: "Eastern Cape",
     caption:
-      "Floodlit PSL matchday intensity captured with split-second precision.",
-    objectPosition: "object-[60%_30%]",
+      "White wedding family portraits captured in soft, even Eastern Cape daylight.",
+    objectPosition: "object-[50%_30%]",
     photo: staticHeroPhoto({
-      id: "44",
-      baseName: "457A8925",
+      id: "8ebd3296",
+      baseName: "file013007",
       ext: "jpg",
+      directory: "8ebd3296-567d-4f91-a284-278bf060d135",
       caption:
-        "Floodlit PSL matchday intensity captured with split-second precision.",
-      createdAt: "2025-08-20T17:53:05.975Z",
-      galleryId: 10,
-      galleryTitle: "Chippa Vs TS Galaxy",
-      gallerySlug: "chippa-vs-ts-galaxy",
+        "White wedding family portraits captured in soft, even Eastern Cape daylight.",
+      createdAt: "2026-11-24T20:13:13.000Z",
+      galleryId: 0,
+      galleryTitle: "White Wedding",
+      gallerySlug: "white-wedding",
       width: 6720,
       height: 4480,
     }),

@@ -180,19 +180,19 @@ const sampleHeroSlides: HeroSlide[] = [
     ),
   },
   {
-    id: "sports",
-    discipline: "Sports",
-    galleryTitle: "Chippa Vs TS Galaxy",
-    gallerySlug: "chippa-vs-ts-galaxy",
-    location: "Buffalo City Stadium",
+    id: "white-wedding",
+    discipline: "White Wedding",
+    galleryTitle: "White Wedding",
+    gallerySlug: "white-wedding",
+    location: "Eastern Cape",
     caption:
-      "Floodlit PSL matchday intensity captured with split-second precision.",
-    objectPosition: "object-[60%_30%]",
+      "White wedding family portraits captured in soft, even Eastern Cape daylight.",
+    objectPosition: "object-[50%_30%]",
     photo: makePhoto(
-      "44",
-      "PSL matchday tackle",
-      "Chippa Vs TS Galaxy",
-      "chippa-vs-ts-galaxy"
+      "8ebd3296",
+      "White wedding family portrait",
+      "White Wedding",
+      "white-wedding"
     ),
   },
   {
@@ -483,10 +483,10 @@ describe("HeroCarouselSection", () => {
 
       const heroImgs = screen.getAllByRole("img");
       const hasHardcodedHeroFull = heroImgs.some((img) =>
-        img.getAttribute("src")?.includes("Keith_PHOTOS_7-2560x1707.webp")
+        img.getAttribute("src")?.includes("457A9885-2560x1707.webp")
       );
       const hasHardcodedSpotlightThumb = heroImgs.some((img) =>
-        img.getAttribute("src")?.includes("Keith_PHOTOS_7-480x320.webp")
+        img.getAttribute("src")?.includes("457A9885-480x320.webp")
       );
       expect(hasHardcodedHeroFull).toBe(true);
       expect(hasHardcodedSpotlightThumb).toBe(true);
@@ -496,7 +496,7 @@ describe("HeroCarouselSection", () => {
           "Weddings",
           "Festivals",
           "Editorial",
-          "Sports",
+          "White Wedding",
           "Landscapes",
         ]) {
           expect(screen.getByRole("tab", { name: pill })).toBeTruthy();
@@ -511,16 +511,22 @@ describe("HeroCarouselSection", () => {
         "/galleries/traditional-weddings"
       );
 
-      await user.click(screen.getByRole("tab", { name: "Sports" }));
+      await user.click(screen.getByRole("tab", { name: "White Wedding" }));
 
       await waitFor(() => {
         expect(screen.getAllByText("04 / 05").length).toBeGreaterThanOrEqual(1);
         const updatedSpotlight = screen.getByRole("link", {
-          name: /Chippa Vs TS Galaxy/i,
+          name: /White Wedding/i,
         });
         expect(updatedSpotlight.getAttribute("href")).toBe(
-          "/galleries/chippa-vs-ts-galaxy"
+          "/galleries/white-wedding"
         );
+        const hasWhiteWeddingPhoto = screen
+          .getAllByRole("img")
+          .some((img) =>
+            img.getAttribute("src")?.includes("file013007-480x320.webp")
+          );
+        expect(hasWhiteWeddingPhoto).toBe(true);
       });
 
       expect(
