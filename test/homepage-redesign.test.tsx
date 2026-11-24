@@ -224,7 +224,7 @@ const sampleExpertiseItems: HomepageExpertiseItem[] = [
     highlights: [
       "Full-day documentary coverage",
       "Same-week curated preview set",
-      "Print-ready R2 gallery archive",
+      "Print-ready gallery archive",
     ],
     gallerySlug: "white-wedding",
     galleryTitle: "White Wedding",
